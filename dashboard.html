@@ -11,7 +11,7 @@
 <header>
   <h2>LaamSocial</h2>
   <div>
-    <span id="userEmail"></span>
+    <span id="userNameDisplay"></span>
     <button id="logoutBtn">Logout</button>
   </div>
 </header>
@@ -28,26 +28,23 @@
     </ul>
   </nav>
 
-  <!-- Main Content -->
+  <!-- Main Content Sections -->
   <main class="main-content">
     <!-- Home Feed -->
     <section id="homeSection">
       <h3>Home Feed</h3>
-      <div id="postSection">
-        <textarea id="postText" placeholder="What's on your mind?"></textarea>
-        <input type="file" id="postImage" accept="image/*">
-        <button id="postBtn">Post</button>
-      </div>
+      <textarea id="postText" placeholder="What's on your mind?"></textarea>
+      <button id="postBtn">Post</button>
       <div id="feed">Loading posts...</div>
     </section>
 
-    <!-- Friends Section -->
+    <!-- Friends -->
     <section id="friendsSection" style="display:none;">
       <h3>Friends</h3>
       <div id="friendsList">Loading users...</div>
     </section>
 
-    <!-- Messages Section -->
+    <!-- Messages -->
     <section id="messagesSection" style="display:none;">
       <h3>Messages</h3>
       <select id="chatUserSelect"><option value="">Select User</option></select>
@@ -56,19 +53,18 @@
       <button id="sendBtn">Send</button>
     </section>
 
-    <!-- Notifications Section -->
+    <!-- Notifications -->
     <section id="notificationsSection" style="display:none;">
       <h3>Notifications</h3>
       <div id="notificationsList">No notifications yet.</div>
     </section>
 
-    <!-- Profile / Settings Section -->
+    <!-- Profile -->
     <section id="profileSection" style="display:none;">
       <h3>Profile / Settings</h3>
-      <img id="profilePicDisplay" src="default-profile.png" alt="Profile Picture" style="width:80px;height:80px;border-radius:50%;">
-      <input type="file" id="profilePicInput" accept="image/*">
-      <p id="profileEmail"></p>
-      <p id="lastSeen"></p>
+      <p>Full Name: <span id="profileFullName"></span></p>
+      <p>Username: <span id="profileUsername"></span></p>
+      <p>Last Seen: <span id="lastSeen"></span></p>
     </section>
   </main>
 </div>
