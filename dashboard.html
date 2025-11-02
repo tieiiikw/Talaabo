@@ -4,97 +4,1343 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>LaamSocial Dashboard</title>
-<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<style>
+  :root {
+    --primary: #6c63ff;
+    --primary-dark: #5a52d5;
+    --secondary: #ff6584;
+    --dark: #2d3748;
+    --light: #f8f9fa;
+    --gray: #a0aec0;
+    --success: #48bb78;
+    --warning: #ed8936;
+    --danger: #f56565;
+    --sidebar-width: 250px;
+    --header-height: 70px;
+  }
+
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  }
+
+  body {
+    background-color: #f5f7fb;
+    color: var(--dark);
+    line-height: 1.6;
+  }
+
+  /* Header Styles */
+  header {
+    background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+    color: white;
+    height: var(--header-height);
+    padding: 0 2rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 1000;
+  }
+
+  header h2 {
+    font-weight: 700;
+    font-size: 1.8rem;
+    letter-spacing: 1px;
+  }
+
+  header div {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  #userEmail {
+    font-weight: 500;
+  }
+
+  #logoutBtn {
+    background: rgba(255, 255, 255, 0.2);
+    border: none;
+    color: white;
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+
+  #logoutBtn:hover {
+    background: rgba(255, 255, 255, 0.3);
+    transform: translateY(-2px);
+  }
+
+  /* Main Container */
+  .container-dashboard {
+    display: flex;
+    margin-top: var(--header-height);
+    min-height: calc(100vh - var(--header-height));
+  }
+
+  /* Sidebar Styles */
+  .sidebar {
+    width: var(--sidebar-width);
+    background: white;
+    box-shadow: 2px 0 10px rgba(0, 0, 0, 0.05);
+    padding: 1.5rem 0;
+    position: fixed;
+    height: calc(100vh - var(--header-height));
+    overflow-y: auto;
+    transition: all 0.3s ease;
+  }
+
+  .sidebar ul {
+    list-style: none;
+  }
+
+  .sidebar li {
+    padding: 1rem 2rem;
+    margin-bottom: 0.5rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    transition: all 0.3s ease;
+    border-left: 4px solid transparent;
+  }
+
+  .sidebar li:hover {
+    background: rgba(108, 99, 255, 0.1);
+    color: var(--primary);
+  }
+
+  .sidebar li.active {
+    background: rgba(108, 99, 255, 0.15);
+    color: var(--primary);
+    border-left: 4px solid var(--primary);
+    font-weight: 600;
+  }
+
+  .sidebar li i {
+    margin-right: 10px;
+    font-size: 1.2rem;
+    width: 24px;
+    text-align: center;
+  }
+
+  /* Main Content */
+  .main-content {
+    flex: 1;
+    margin-left: var(--sidebar-width);
+    padding: 2rem;
+    transition: all 0.3s ease;
+  }
+
+  section {
+    background: white;
+    border-radius: 12px;
+    padding: 1.5rem;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+    margin-bottom: 2rem;
+    display: none;
+  }
+
+  section.active {
+    display: block;
+    animation: fadeIn 0.5s ease;
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  h3 {
+    color: var(--primary);
+    margin-bottom: 1.5rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 2px solid #f0f0f0;
+    font-size: 1.5rem;
+  }
+
+  /* Post Section */
+  #postSection {
+    background: #f8f9ff;
+    padding: 1.5rem;
+    border-radius: 10px;
+    margin-bottom: 2rem;
+  }
+
+  #postText {
+    width: 100%;
+    min-height: 100px;
+    padding: 1rem;
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+    margin-bottom: 1rem;
+    resize: vertical;
+    font-size: 1rem;
+    transition: border 0.3s ease;
+  }
+
+  #postText:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(108, 99, 255, 0.2);
+  }
+
+  .file-upload-container {
+    display: flex;
+    align-items: center;
+    margin-bottom: 1rem;
+  }
+
+  .file-upload-label {
+    background: var(--light);
+    padding: 0.5rem 1rem;
+    border-radius: 8px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    transition: all 0.3s ease;
+    border: 1px dashed var(--gray);
+  }
+
+  .file-upload-label:hover {
+    background: #e9ecef;
+  }
+
+  #postImage {
+    display: none;
+  }
+
+  #postBtn {
+    background: var(--primary);
+    color: white;
+    border: none;
+    padding: 0.8rem 1.5rem;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    display: block;
+    width: 100%;
+  }
+
+  #postBtn:hover {
+    background: var(--primary-dark);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(108, 99, 255, 0.3);
+  }
+
+  /* Feed */
+  .post {
+    background: white;
+    border-radius: 10px;
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    border: 1px solid #f0f0f0;
+  }
+
+  .post-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 1rem;
+  }
+
+  .post-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: var(--primary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: bold;
+    margin-right: 1rem;
+  }
+
+  .post-user {
+    font-weight: 600;
+  }
+
+  .post-time {
+    color: var(--gray);
+    font-size: 0.85rem;
+  }
+
+  .post-content {
+    margin-bottom: 1rem;
+  }
+
+  .post-image {
+    width: 100%;
+    border-radius: 8px;
+    margin-top: 1rem;
+  }
+
+  .post-actions {
+    display: flex;
+    gap: 1rem;
+    border-top: 1px solid #f0f0f0;
+    padding-top: 1rem;
+  }
+
+  .post-action {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    cursor: pointer;
+    color: var(--gray);
+    transition: all 0.3s ease;
+  }
+
+  .post-action:hover {
+    color: var(--primary);
+  }
+
+  /* Friends Section */
+  .friends-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 1.5rem;
+  }
+
+  .friend-card {
+    background: white;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08);
+    transition: all 0.3s ease;
+    text-align: center;
+    border: 1px solid #f0f0f0;
+  }
+
+  .friend-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+  }
+
+  .friend-avatar {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    background: var(--primary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: bold;
+    font-size: 1.5rem;
+    margin: 1.5rem auto 1rem;
+  }
+
+  .friend-name {
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+  }
+
+  .friend-status {
+    display: inline-block;
+    padding: 0.3rem 0.8rem;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    margin-bottom: 1rem;
+  }
+
+  .online {
+    background: rgba(72, 187, 120, 0.2);
+    color: var(--success);
+  }
+
+  .offline {
+    background: rgba(160, 174, 192, 0.2);
+    color: var(--gray);
+  }
+
+  .friend-actions {
+    display: flex;
+    border-top: 1px solid #f0f0f0;
+  }
+
+  .friend-action {
+    flex: 1;
+    padding: 0.8rem;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+
+  .friend-action:hover {
+    background: #f8f9fa;
+  }
+
+  .friend-action.message {
+    color: var(--primary);
+  }
+
+  .friend-action.remove {
+    color: var(--danger);
+  }
+
+  /* Messages Section */
+  .messages-container {
+    display: flex;
+    gap: 1.5rem;
+    height: 500px;
+  }
+
+  .conversations-list {
+    width: 300px;
+    background: #f8f9ff;
+    border-radius: 10px;
+    padding: 1rem;
+    overflow-y: auto;
+  }
+
+  .conversation {
+    display: flex;
+    align-items: center;
+    padding: 1rem;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin-bottom: 0.5rem;
+  }
+
+  .conversation:hover {
+    background: white;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+  }
+
+  .conversation.active {
+    background: white;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  }
+
+  .conversation-avatar {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background: var(--primary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: bold;
+    margin-right: 1rem;
+  }
+
+  .conversation-info {
+    flex: 1;
+  }
+
+  .conversation-name {
+    font-weight: 600;
+    margin-bottom: 0.2rem;
+  }
+
+  .conversation-preview {
+    color: var(--gray);
+    font-size: 0.85rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 180px;
+  }
+
+  .conversation-time {
+    font-size: 0.75rem;
+    color: var(--gray);
+  }
+
+  .chat-area {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    background: white;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+  }
+
+  .chat-header {
+    padding: 1rem 1.5rem;
+    background: #f8f9ff;
+    border-bottom: 1px solid #e2e8f0;
+    display: flex;
+    align-items: center;
+  }
+
+  .chat-user-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: var(--primary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: bold;
+    margin-right: 1rem;
+  }
+
+  .chat-user-info {
+    flex: 1;
+  }
+
+  .chat-user-name {
+    font-weight: 600;
+  }
+
+  .chat-user-status {
+    font-size: 0.8rem;
+    color: var(--success);
+  }
+
+  .chat-actions {
+    display: flex;
+    gap: 1rem;
+  }
+
+  .chat-action {
+    color: var(--gray);
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+
+  .chat-action:hover {
+    color: var(--primary);
+  }
+
+  .chat-messages {
+    flex: 1;
+    padding: 1.5rem;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .message {
+    max-width: 70%;
+    padding: 0.8rem 1rem;
+    border-radius: 18px;
+    position: relative;
+    animation: fadeIn 0.3s ease;
+  }
+
+  .message.sent {
+    align-self: flex-end;
+    background: var(--primary);
+    color: white;
+    border-bottom-right-radius: 5px;
+  }
+
+  .message.received {
+    align-self: flex-start;
+    background: #f1f3f9;
+    color: var(--dark);
+    border-bottom-left-radius: 5px;
+  }
+
+  .message-time {
+    font-size: 0.7rem;
+    opacity: 0.7;
+    margin-top: 0.3rem;
+    text-align: right;
+  }
+
+  .chat-input-area {
+    display: flex;
+    padding: 1rem 1.5rem;
+    border-top: 1px solid #e2e8f0;
+    gap: 1rem;
+  }
+
+  #chatInput {
+    flex: 1;
+    padding: 0.8rem 1rem;
+    border: 1px solid #e2e8f0;
+    border-radius: 24px;
+    outline: none;
+    transition: all 0.3s ease;
+  }
+
+  #chatInput:focus {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 2px rgba(108, 99, 255, 0.2);
+  }
+
+  #sendBtn {
+    background: var(--primary);
+    color: white;
+    border: none;
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+  }
+
+  #sendBtn:hover {
+    background: var(--primary-dark);
+    transform: scale(1.05);
+  }
+
+  /* Notifications Section */
+  .notification {
+    display: flex;
+    align-items: flex-start;
+    padding: 1rem;
+    border-radius: 10px;
+    margin-bottom: 1rem;
+    background: #f8f9ff;
+    border-left: 4px solid var(--primary);
+  }
+
+  .notification.unread {
+    background: white;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+  }
+
+  .notification-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: var(--primary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    margin-right: 1rem;
+    flex-shrink: 0;
+  }
+
+  .notification-content {
+    flex: 1;
+  }
+
+  .notification-title {
+    font-weight: 600;
+    margin-bottom: 0.3rem;
+  }
+
+  .notification-time {
+    font-size: 0.8rem;
+    color: var(--gray);
+  }
+
+  /* Profile Section */
+  .profile-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 2rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 1px solid #f0f0f0;
+  }
+
+  .profile-avatar-container {
+    position: relative;
+    margin-right: 2rem;
+  }
+
+  #profilePicDisplay {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 4px solid white;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  }
+
+  .profile-avatar-overlay {
+    position: absolute;
+    bottom: 5px;
+    right: 5px;
+    background: var(--primary);
+    color: white;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+
+  .profile-avatar-overlay:hover {
+    background: var(--primary-dark);
+    transform: scale(1.1);
+  }
+
+  .profile-info h4 {
+    font-size: 1.5rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .profile-stats {
+    display: flex;
+    gap: 2rem;
+    margin-top: 1rem;
+  }
+
+  .profile-stat {
+    text-align: center;
+  }
+
+  .stat-value {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--primary);
+  }
+
+  .stat-label {
+    font-size: 0.9rem;
+    color: var(--gray);
+  }
+
+  .profile-details {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 1.5rem;
+  }
+
+  .detail-card {
+    background: #f8f9ff;
+    padding: 1.5rem;
+    border-radius: 10px;
+  }
+
+  .detail-card h5 {
+    margin-bottom: 1rem;
+    color: var(--primary);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .detail-item {
+    display: flex;
+    justify-content: space-between;
+    padding: 0.7rem 0;
+    border-bottom: 1px solid #e2e8f0;
+  }
+
+  .detail-item:last-child {
+    border-bottom: none;
+  }
+
+  .detail-label {
+    color: var(--gray);
+  }
+
+  .detail-value {
+    font-weight: 500;
+  }
+
+  /* Responsive Design */
+  @media (max-width: 992px) {
+    .sidebar {
+      width: 70px;
+      overflow: visible;
+    }
+    
+    .sidebar li span {
+      display: none;
+    }
+    
+    .sidebar li i {
+      margin-right: 0;
+      font-size: 1.5rem;
+    }
+    
+    .main-content {
+      margin-left: 70px;
+    }
+    
+    .messages-container {
+      flex-direction: column;
+      height: auto;
+    }
+    
+    .conversations-list {
+      width: 100%;
+      max-height: 200px;
+    }
+  }
+
+  @media (max-width: 768px) {
+    .sidebar {
+      transform: translateX(-100%);
+      z-index: 999;
+    }
+    
+    .sidebar.active {
+      transform: translateX(0);
+    }
+    
+    .main-content {
+      margin-left: 0;
+      padding: 1rem;
+    }
+    
+    .menu-toggle {
+      display: block;
+      position: fixed;
+      top: 1rem;
+      left: 1rem;
+      z-index: 1001;
+      background: var(--primary);
+      color: white;
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+    }
+    
+    .profile-header {
+      flex-direction: column;
+      text-align: center;
+    }
+    
+    .profile-avatar-container {
+      margin-right: 0;
+      margin-bottom: 1rem;
+    }
+    
+    .friends-grid {
+      grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    }
+  }
+</style>
 </head>
 <body>
 
 <header>
   <h2>LaamSocial</h2>
   <div>
-    <span id="userEmail"></span>
+    <span id="userEmail">user@example.com</span>
     <button id="logoutBtn">Logout</button>
   </div>
 </header>
+
+<div class="menu-toggle">
+  <i class="fas fa-bars"></i>
+</div>
 
 <div class="container-dashboard">
   <!-- Sidebar / Menu -->
   <nav class="sidebar">
     <ul>
-      <li id="menuHome">Home</li>
-      <li id="menuFriends">Friends</li>
-      <li id="menuMessages">Messages</li>
-      <li id="menuNotifications">Notifications</li>
-      <li id="menuProfile">Profile / Settings</li>
+      <li class="active" data-section="homeSection">
+        <i class="fas fa-home"></i>
+        <span>Home</span>
+      </li>
+      <li data-section="friendsSection">
+        <i class="fas fa-user-friends"></i>
+        <span>Friends</span>
+      </li>
+      <li data-section="messagesSection">
+        <i class="fas fa-comments"></i>
+        <span>Messages</span>
+      </li>
+      <li data-section="notificationsSection">
+        <i class="fas fa-bell"></i>
+        <span>Notifications</span>
+      </li>
+      <li data-section="profileSection">
+        <i class="fas fa-user-cog"></i>
+        <span>Profile / Settings</span>
+      </li>
     </ul>
   </nav>
 
   <!-- Main Content -->
   <main class="main-content">
     <!-- Home Feed -->
-    <section id="homeSection">
+    <section id="homeSection" class="active">
       <h3>Home Feed</h3>
       <div id="postSection">
         <textarea id="postText" placeholder="What's on your mind?"></textarea>
-        <input type="file" id="postImage" accept="image/*">
+        <div class="file-upload-container">
+          <label for="postImage" class="file-upload-label">
+            <i class="fas fa-image"></i>
+            <span>Add Image</span>
+          </label>
+          <input type="file" id="postImage" accept="image/*">
+        </div>
         <button id="postBtn">Post</button>
       </div>
-      <div id="feed">Loading posts...</div>
+      <div id="feed">
+        <!-- Sample posts -->
+        <div class="post">
+          <div class="post-header">
+            <div class="post-avatar">JS</div>
+            <div>
+              <div class="post-user">John Smith</div>
+              <div class="post-time">2 hours ago</div>
+            </div>
+          </div>
+          <div class="post-content">
+            Just visited the most amazing place! The mountains were breathtaking and the weather was perfect for hiking. Can't wait to go back again soon!
+          </div>
+          <div class="post-actions">
+            <div class="post-action">
+              <i class="far fa-heart"></i>
+              <span>24</span>
+            </div>
+            <div class="post-action">
+              <i class="far fa-comment"></i>
+              <span>8</span>
+            </div>
+            <div class="post-action">
+              <i class="far fa-share-square"></i>
+              <span>3</span>
+            </div>
+          </div>
+        </div>
+        
+        <div class="post">
+          <div class="post-header">
+            <div class="post-avatar">ES</div>
+            <div>
+              <div class="post-user">Emma Johnson</div>
+              <div class="post-time">5 hours ago</div>
+            </div>
+          </div>
+          <div class="post-content">
+            Just finished reading an incredible book! Highly recommend "The Midnight Library" to anyone looking for a thought-provoking read.
+          </div>
+          <div class="post-actions">
+            <div class="post-action">
+              <i class="far fa-heart"></i>
+              <span>42</span>
+            </div>
+            <div class="post-action">
+              <i class="far fa-comment"></i>
+              <span>15</span>
+            </div>
+            <div class="post-action">
+              <i class="far fa-share-square"></i>
+              <span>7</span>
+            </div>
+          </div>
+        </div>
+      </div>
     </section>
 
     <!-- Friends Section -->
-    <section id="friendsSection" style="display:none;">
+    <section id="friendsSection">
       <h3>Friends</h3>
-      <div id="friendsList">Loading users...</div>
+      <div class="friends-grid" id="friendsList">
+        <!-- Sample friends -->
+        <div class="friend-card">
+          <div class="friend-avatar">MJ</div>
+          <div class="friend-name">Michael Jordan</div>
+          <div class="friend-status online">Online</div>
+          <div class="friend-actions">
+            <div class="friend-action message">
+              <i class="fas fa-comment"></i>
+            </div>
+            <div class="friend-action remove">
+              <i class="fas fa-user-minus"></i>
+            </div>
+          </div>
+        </div>
+        
+        <div class="friend-card">
+          <div class="friend-avatar">SR</div>
+          <div class="friend-name">Sarah Roberts</div>
+          <div class="friend-status offline">Offline</div>
+          <div class="friend-actions">
+            <div class="friend-action message">
+              <i class="fas fa-comment"></i>
+            </div>
+            <div class="friend-action remove">
+              <i class="fas fa-user-minus"></i>
+            </div>
+          </div>
+        </div>
+        
+         
+        <div class="friend-card">
+          <div class="friend-avatar">DW</div>
+          <div class="friend-name">David Wilson</div>
+          <div class="friend-status online">Online</div>
+          <div class="friend-actions">
+            <div class="friend-action message">
+              <i class="fas fa-comment"></i>
+            </div>
+            <div class="friend-action remove">
+              <i class="fas fa-user-minus"></i>
+            </div>
+          </div>
+        </div>
+        
+        <div class="friend-card">
+          <div class="friend-avatar">LP</div>
+          <div class="friend-name">Lisa Parker</div>
+          <div class="friend-status online">Online</div>
+          <div class="friend-actions">
+            <div class="friend-action message">
+              <i class="fas fa-comment"></i>
+            </div>
+            <div class="friend-action remove">
+              <i class="fas fa-user-minus"></i>
+            </div>
+          </div>
+        </div>
+      </div>
     </section>
 
     <!-- Messages Section -->
-    <section id="messagesSection" style="display:none;">
+    <section id="messagesSection">
       <h3>Messages</h3>
-      <select id="chatUserSelect"><option value="">Select User</option></select>
-      <div id="chatBox"></div>
-      <input type="text" id="chatInput" placeholder="Type a message...">
-      <button id="sendBtn">Send</button>
+      <div class="messages-container">
+        <div class="conversations-list">
+          <div class="conversation active">
+            <div class="conversation-avatar">MJ</div>
+            <div class="conversation-info">
+              <div class="conversation-name">Michael Jordan</div>
+              <div class="conversation-preview">Hey, are we still meeting tomorrow?</div>
+            </div>
+            <div class="conversation-time">10:24 AM</div>
+          </div>
+          
+          <div class="conversation">
+            <div class="conversation-avatar">SR</div>
+            <div class="conversation-info">
+              <div class="conversation-name">Sarah Roberts</div>
+              <div class="conversation-preview">Thanks for your help with the project!</div>
+            </div>
+            <div class="conversation-time">Yesterday</div>
+          </div>
+          
+          <div class="conversation">
+            <div class="conversation-avatar">DW</div>
+            <div class="conversation-info">
+              <div class="conversation-name">David Wilson</div>
+              <div class="conversation-preview">Check out this new restaurant</div>
+            </div>
+            <div class="conversation-time">Monday</div>
+          </div>
+        </div>
+        
+        <div class="chat-area">
+          <div class="chat-header">
+            <div class="chat-user-avatar">MJ</div>
+            <div class="chat-user-info">
+              <div class="chat-user-name">Michael Jordan</div>
+              <div class="chat-user-status">Online</div>
+            </div>
+            <div class="chat-actions">
+              <div class="chat-action"><i class="fas fa-phone"></i></div>
+              <div class="chat-action"><i class="fas fa-video"></i></div>
+              <div class="chat-action"><i class="fas fa-ellipsis-v"></i></div>
+            </div>
+          </div>
+          
+          <div class="chat-messages" id="chatBox">
+            <div class="message received">
+              Hey, are we still meeting tomorrow?
+              <div class="message-time">10:24 AM</div>
+            </div>
+            
+            <div class="message sent">
+              Yes, definitely! 2 PM at the usual place.
+              <div class="message-time">10:25 AM</div>
+            </div>
+            
+            <div class="message received">
+              Perfect! I'll bring the documents we discussed.
+              <div class="message-time">10:26 AM</div>
+            </div>
+            
+            <div class="message sent">
+              Great, looking forward to it!
+              <div class="message-time">10:27 AM</div>
+            </div>
+          </div>
+          
+          <div class="chat-input-area">
+            <input type="text" id="chatInput" placeholder="Type a message...">
+            <button id="sendBtn"><i class="fas fa-paper-plane"></i></button>
+          </div>
+        </div>
+      </div>
     </section>
 
     <!-- Notifications Section -->
-    <section id="notificationsSection" style="display:none;">
+    <section id="notificationsSection">
       <h3>Notifications</h3>
-      <div id="notificationsList">No notifications yet.</div>
+      <div id="notificationsList">
+        <!-- Sample notifications -->
+        <div class="notification unread">
+          <div class="notification-icon">
+            <i class="fas fa-user-plus"></i>
+          </div>
+          <div class="notification-content">
+            <div class="notification-title">Michael Jordan sent you a friend request</div>
+            <div class="notification-time">5 minutes ago</div>
+          </div>
+        </div>
+        
+        <div class="notification">
+          <div class="notification-icon">
+            <i class="fas fa-heart"></i>
+          </div>
+          <div class="notification-content">
+            <div class="notification-title">Sarah Roberts liked your post</div>
+            <div class="notification-time">1 hour ago</div>
+          </div>
+        </div>
+        
+        <div class="notification">
+          <div class="notification-icon">
+            <i class="fas fa-comment"></i>
+          </div>
+          <div class="notification-content">
+            <div class="notification-title">David Wilson commented on your photo</div>
+            <div class="notification-time">3 hours ago</div>
+          </div>
+        </div>
+        
+        <div class="notification">
+          <div class="notification-icon">
+            <i class="fas fa-birthday-cake"></i>
+          </div>
+          <div class="notification-content">
+            <div class="notification-title">It's Lisa Parker's birthday today!</div>
+            <div class="notification-time">Yesterday</div>
+          </div>
+        </div>
+      </div>
     </section>
 
     <!-- Profile / Settings Section -->
-    <section id="profileSection" style="display:none;">
+    <section id="profileSection">
       <h3>Profile / Settings</h3>
-      <img id="profilePicDisplay" src="default-profile.png" alt="Profile Picture" style="width:80px;height:80px;border-radius:50%;">
-      <input type="file" id="profilePicInput" accept="image/*">
-      <p id="profileEmail"></p>
-      <p id="lastSeen"></p>
+      <div class="profile-header">
+        <div class="profile-avatar-container">
+          <img id="profilePicDisplay" src="https://via.placeholder.com/120" alt="Profile Picture">
+          <div class="profile-avatar-overlay">
+            <i class="fas fa-camera"></i>
+          </div>
+        </div>
+        <div class="profile-info">
+          <h4>John Doe</h4>
+          <p id="profileEmail">john.doe@example.com</p>
+          <p id="lastSeen">Last seen: Today at 11:30 AM</p>
+          <div class="profile-stats">
+            <div class="profile-stat">
+              <div class="stat-value">247</div>
+              <div class="stat-label">Friends</div>
+            </div>
+            <div class="profile-stat">
+              <div class="stat-value">1.2K</div>
+              <div class="stat-label">Posts</div>
+            </div>
+            <div class="profile-stat">
+              <div class="stat-value">84</div>
+              <div class="stat-label">Photos</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="profile-details">
+        <div class="detail-card">
+          <h5><i class="fas fa-user"></i> Personal Information</h5>
+          <div class="detail-item">
+            <span class="detail-label">Full Name</span>
+            <span class="detail-value">John Doe</span>
+          </div>
+          <div class="detail-item">
+            <span class="detail-label">Email</span>
+            <span class="detail-value">john.doe@example.com</span>
+          </div>
+          <div class="detail-item">
+            <span class="detail-label">Phone</span>
+            <span class="detail-value">+1 (555) 123-4567</span>
+          </div>
+          <div class="detail-item">
+            <span class="detail-label">Birthday</span>
+            <span class="detail-value">March 15, 1990</span>
+          </div>
+        </div>
+        
+        <div class="detail-card">
+          <h5><i class="fas fa-cog"></i> Account Settings</h5>
+          <div class="detail-item">
+            <span class="detail-label">Privacy</span>
+            <span class="detail-value">Friends</span>
+          </div>
+          <div class="detail-item">
+            <span class="detail-label">Language</span>
+            <span class="detail-value">English</span>
+          </div>
+          <div class="detail-item">
+            <span class="detail-label">Notifications</span>
+            <span class="detail-value">Enabled</span>
+          </div>
+          <div class="detail-item">
+            <span class="detail-label">Theme</span>
+            <span class="detail-value">Light</span>
+          </div>
+        </div>
+      </div>
     </section>
   </main>
 </div>
 
-<script type="module" src="app.js"></script>
 <script>
   // Menu Navigation
-  const sections = {
-    home: document.getElementById("homeSection"),
-    friends: document.getElementById("friendsSection"),
-    messages: document.getElementById("messagesSection"),
-    notifications: document.getElementById("notificationsSection"),
-    profile: document.getElementById("profileSection")
-  };
+  const menuItems = document.querySelectorAll('.sidebar li');
+  const sections = document.querySelectorAll('.main-content section');
+  
+  menuItems.forEach(item => {
+    item.addEventListener('click', function() {
+      const targetSection = this.getAttribute('data-section');
+      
+      // Update active menu item
+      menuItems.forEach(i => i.classList.remove('active'));
+      this.classList.add('active');
+      
+      // Show target section
+      sections.forEach(section => {
+        section.classList.remove('active');
+        if (section.id === targetSection) {
+          section.classList.add('active');
+        }
+      });
+    });
+  });
 
-  function showSection(sectionName){
-    for(const key in sections){
-      sections[key].style.display = (key === sectionName) ? "block" : "none";
+  // Mobile menu toggle
+  const menuToggle = document.querySelector('.menu-toggle');
+  const sidebar = document.querySelector('.sidebar');
+  
+  menuToggle.addEventListener('click', function() {
+    sidebar.classList.toggle('active');
+  });
+
+  // Send message functionality
+  const chatInput = document.getElementById('chatInput');
+  const sendBtn = document.getElementById('sendBtn');
+  const chatBox = document.getElementById('chatBox');
+  
+  function sendMessage() {
+    const message = chatInput.value.trim();
+    if (message) {
+      const messageElement = document.createElement('div');
+      messageElement.classList.add('message', 'sent');
+      
+      const now = new Date();
+      const timeString = now.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+      
+      messageElement.innerHTML = `
+        ${message}
+        <div class="message-time">${timeString}</div>
+      `;
+      
+      chatBox.appendChild(messageElement);
+      chatInput.value = '';
+      chatBox.scrollTop = chatBox.scrollHeight;
     }
   }
+  
+  sendBtn.addEventListener('click', sendMessage);
+  
+  chatInput.addEventListener('keypress', function(e) {
+    if (e.key === 'Enter') {
+      sendMessage();
+    }
+  });
 
-  document.getElementById("menuHome").addEventListener("click", ()=> showSection("home"));
-  document.getElementById("menuFriends").addEventListener("click", ()=> showSection("friends"));
-  document.getElementById("menuMessages").addEventListener("click", ()=> showSection("messages"));
-  document.getElementById("menuNotifications").addEventListener("click", ()=> showSection("notifications"));
-  document.getElementById("menuProfile").addEventListener("click", ()=> showSection("profile"));
+  // Simulate receiving a message after a delay
+  setTimeout(() => {
+    const messageElement = document.createElement('div');
+    messageElement.classList.add('message', 'received');
+    
+    const now = new Date();
+    const timeString = now.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+    
+    messageElement.innerHTML = `
+      Sounds good! See you then.
+      <div class="message-time">${timeString}</div>
+    `;
+    
+    chatBox.appendChild(messageElement);
+    chatBox.scrollTop = chatBox.scrollHeight;
+  }, 5000);
+
+  // Post functionality
+  const postBtn = document.getElementById('postBtn');
+  const postText = document.getElementById('postText');
+  const feed = document.getElementById('feed');
+  
+  postBtn.addEventListener('click', function() {
+    const content = postText.value.trim();
+    if (content) {
+      const postElement = document.createElement('div');
+      postElement.classList.add('post');
+      
+      const now = new Date();
+      const timeString = now.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+      
+      postElement.innerHTML = `
+        <div class="post-header">
+          <div class="post-avatar">JD</div>
+          <div>
+            <div class="post-user">John Doe</div>
+            <div class="post-time">Just now</div>
+          </div>
+        </div>
+        <div class="post-content">
+          ${content}
+        </div>
+        <div class="post-actions">
+          <div class="post-action">
+            <i class="far fa-heart"></i>
+            <span>0</span>
+          </div>
+          <div class="post-action">
+            <i class="far fa-comment"></i>
+            <span>0</span>
+          </div>
+          <div class="post-action">
+            <i class="far fa-share-square"></i>
+            <span>0</span>
+          </div>
+        </div>
+      `;
+      
+      feed.prepend(postElement);
+      postText.value = '';
+    }
+  });
+
+   // Simulate user data
+  document.getElementById('userEmail').textContent = 'john.doe@example.com';
+  document.getElementById('profileEmail').textContent = 'john.doe@example.com';
 </script>
 </body>
 </html>
+   
