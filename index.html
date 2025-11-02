@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>LaamSocial - Login</title>
+  <link rel="stylesheet" href="style.css" />
+
+  <!-- Firebase SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/9.24.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.24.0/firebase-auth-compat.js"></script>
+</head>
+<body>
+  <div class="container">
+    <h2>LaamSocial</h2>
+
+    <div class="form">
+      <input type="email" id="email" placeholder="Email" required />
+      <input type="password" id="password" placeholder="Password" required />
+      <button id="loginBtn">Login</button>
+      <button id="registerBtn" class="alt">Register</button>
+    </div>
+
+    <p id="message"></p>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
