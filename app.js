@@ -1,123 +1,128 @@
-const firebaseConfig = {
-  apiKey: "AIzaSyDy_GTVZvwCZp8eLYvd_TUPI-uo_Jp5MpY",
-  authDomain: "laamsocial-98cce.firebaseapp.com",
-  projectId: "laamsocial-98cce",
-  storageBucket: "laamsocial-98cce.appspot.com",
-  messagingSenderId: "649707204234",
-  appId: "1:649707204234:web:9be9178e24888c2c674773"
-};
+import { auth, db, storage } from './firebase.js';
+import {
+  onAuthStateChanged, signOut
+} from "https://www.gstatic.com/firebasejs/12.5.0/firebase-auth.js";
+import {
+  collection, addDoc, getDocs, serverTimestamp, query, orderBy
+} from "https://www.gstatic.com/firebasejs/12.5.0/firebase-firestore.js";
+import {
+  ref, uploadBytes, getDownloadURL
+} from "https://www.gstatic.com/firebasejs/12.5.0/firebase-storage.js";
 
-// Firebase init
-firebase.initializeApp(firebaseConfig);
-const auth = firebase.auth();
-const db = firebase.firestore();
-const storage = firebase.storage();
+const userEmail = document.getElementById("userEmail");
+const logoutBtn = document.getElementById("logoutBtn");
+const postBtn = document.getElementById("postBtn");
+const postText = document.getElementById("postText");
+const postImage = document.getElementById("postImage");
+const feed = document.getElementById("feed");
 
-const emailInput = document.getElementById("email");
-const passwordInput = document.getElementById("password");
-const loginBtn = document.getElementById("loginBtn");
-const registerBtn = document.getElementById("registerBtn");
-const message = document.getElementById("message");
+const chatUserSelect = document.getElementById("chatUserSelect");
+const chatBox = document.getElementById("chatBox");
+const chatInput = document.getElementById("chatInput");
+const sendBtn = document.getElementById("sendBtn");
 
-// Auth Register/Login
-if (registerBtn) {
-  registerBtn.addEventListener("click", async () => {
-    const email = emailInput.value.trim();
-    const password = passwordInput.value.trim();
+let currentUserEmail = "";
 
-    try {
-      await auth.createUserWithEmailAndPassword(email, password);
-      message.style.color = "green";
-      message.textContent = "Account created successfully!";
-      setTimeout(() => (window.location.href = "dashboard.html"), 1500);
-    } catch (error) {
-      message.style.color = "red";
-      message.textContent = error.message;
-    }
-  });
-}
-
-if (loginBtn) {
-  loginBtn.addEventListener("click", async () => {
-    const email = emailInput.value.trim();
-    const password = passwordInput.value.trim();
-
-    try {
-      await auth.signInWithEmailAndPassword(email, password);
-      message.style.color = "green";
-      message.textContent = "Login successful!";
-      setTimeout(() => (window.location.href = "dashboard.html"), 1000);
-    } catch (error) {
-      message.style.color = "red";
-      message.textContent = error.message;
-    }
-  });
-}
-
-// Dashboard & Feed Logic
-if (window.location.pathname.includes("dashboard.html")) {
-  const userEmail = document.getElementById("userEmail");
-  const logoutBtn = document.getElementById("logoutBtn");
-  const postForm = document.getElementById("postForm");
-  const postText = document.getElementById("postText");
-  const postImage = document.getElementById("postImage");
-  const feed = document.getElementById("feed");
-
-  auth.onAuthStateChanged((user) => {
-    if (user) {
-      userEmail.textContent = user.email;
-      loadFeed();
-    } else {
-      window.location.href = "index.html";
-    }
-  });
-
-  logoutBtn.addEventListener("click", async () => {
-    await auth.signOut();
-    window.location.href = "index.html";
-  });
-
-  postForm.addEventListener("submit", async (e) => {
-    e.preventDefault();
-    const user = auth.currentUser;
-    if (!user) return;
-
-    const text = postText.value.trim();
-    const file = postImage.files[0];
-    let imageUrl = "";
-
-    if (file) {
-      const ref = storage.ref(`posts/${Date.now()}_${file.name}`);
-      await ref.put(file);
-      imageUrl = await ref.getDownloadURL();
-    }
-
-    await db.collection("posts").add({
-      user: user.email,
-      text,
-      imageUrl,
-      createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-    });
-
-    postText.value = "";
-    postImage.value = "";
+// Auth state
+onAuthStateChanged(auth, async (user) => {
+  if (user) {
+    currentUserEmail = user.email;
+    userEmail.textContent = currentUserEmail;
     loadFeed();
+    loadUsers();
+  } else {
+    window.location.href = "index.html";
+  }
+});
+
+// Logout
+logoutBtn.addEventListener("click", async () => {
+  await signOut(auth);
+  window.location.href = "index.html";
+});
+
+// Post functionality
+postBtn.addEventListener("click", async () => {
+  let text = postText.value.trim();
+  let file = postImage.files[0];
+  let imageUrl = "";
+
+  if (file) {
+    const fileRef = ref(storage, `posts/${Date.now()}_${file.name}`);
+    await uploadBytes(fileRef, file);
+    imageUrl = await getDownloadURL(fileRef);
+  }
+
+  await addDoc(collection(db, "posts"), {
+    user: currentUserEmail,
+    text,
+    imageUrl,
+    createdAt: serverTimestamp()
   });
 
-  async function loadFeed() {
-    feed.innerHTML = "<p>Loading posts...</p>";
-    const snapshot = await db.collection("posts").orderBy("createdAt", "desc").get();
-    feed.innerHTML = "";
-    snapshot.forEach((doc) => {
-      const post = doc.data();
+  postText.value = "";
+  postImage.value = "";
+  loadFeed();
+});
+
+// Load Feed
+async function loadFeed() {
+  feed.innerHTML = "<p>Loading posts...</p>";
+  const q = query(collection(db, "posts"), orderBy("createdAt", "desc"));
+  const snapshot = await getDocs(q);
+  feed.innerHTML = "";
+  snapshot.forEach(doc => {
+    const post = doc.data();
+    const div = document.createElement("div");
+    div.className = "post-card";
+    div.innerHTML = `<p><strong>${post.user}</strong></p>
+                     <p>${post.text || ""}</p>
+                     ${post.imageUrl ? `<img src="${post.imageUrl}"/>` : ""}`;
+    feed.appendChild(div);
+  });
+}
+
+// Load Users for chat
+async function loadUsers() {
+  const snapshot = await getDocs(collection(db, "users"));
+  chatUserSelect.innerHTML = `<option value="">Select User</option>`;
+  snapshot.forEach(doc => {
+    const email = doc.data().email;
+    if(email !== currentUserEmail){
+      chatUserSelect.innerHTML += `<option value="${email}">${email}</option>`;
+    }
+  });
+}
+
+// Chat send
+sendBtn.addEventListener("click", async () => {
+  const toUser = chatUserSelect.value;
+  const message = chatInput.value.trim();
+  if(!toUser || !message) return;
+
+  await addDoc(collection(db, "chats"), {
+    from: currentUserEmail,
+    to: toUser,
+    message,
+    createdAt: serverTimestamp()
+  });
+
+  chatInput.value = "";
+  loadChat(toUser);
+});
+
+// Load Chat
+async function loadChat(toUser) {
+  chatBox.innerHTML = "";
+  const snapshot = await getDocs(collection(db, "chats"));
+  snapshot.forEach(doc => {
+    const chat = doc.data();
+    if((chat.from === currentUserEmail && chat.to === toUser) ||
+       (chat.from === toUser && chat.to === currentUserEmail)){
       const div = document.createElement("div");
-      div.className = "post-card";
-      div.innerHTML = `
-        <p><strong>${post.user}</strong></p>
-        <p>${post.text || ""}</p>
-        ${post.imageUrl ? `<img src="${post.imageUrl}" alt="Post image"/>` : ""}
-      `;
-      feed.appendChild(div);
-    });
-  }
+      div.className = `chat-message ${chat.from === currentUserEmail ? "self" : ""}`;
+      div.textContent = `${chat.from}: ${chat.message}`;
+      chatBox.appendChild(div);
+    }
+  });
 }
