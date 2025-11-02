@@ -3,36 +3,47 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>LaamSocial - Dashboard</title>
+  <title>LaamSocial Dashboard</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <div class="container dashboard">
-    <div class="top-bar">
-      <h2>LaamSocial</h2>
-      <button id="logoutBtn" class="logout-btn">Logout</button>
+  <header>
+    <h2>LaamSocial</h2>
+    <div>
+      <span id="userEmail"></span>
+      <button id="logoutBtn">Logout</button>
     </div>
+  </header>
 
-    <p>Logged in as: <strong id="userEmail"></strong></p>
+  <main>
+    <section id="profile">
+      <h3>Profile</h3>
+      <p id="profileEmail"></p>
+      <p id="lastSeen"></p>
+    </section>
 
-    <div class="post-form">
-      <textarea id="postText" placeholder="What's on your mind?" required></textarea>
+    <section id="postSection">
+      <h3>Create Post</h3>
+      <textarea id="postText" placeholder="What's on your mind?"></textarea>
       <input type="file" id="postImage" accept="image/*">
       <button id="postBtn">Post</button>
-    </div>
+    </section>
 
-    <div class="feed-container" id="feed"></div>
+    <section id="feedSection">
+      <h3>Feed</h3>
+      <div id="feed">Loading posts...</div>
+    </section>
 
-    <div class="chat-container">
-      <h3>Chat with another user</h3>
+    <section id="chatSection">
+      <h3>Chat</h3>
       <select id="chatUserSelect">
         <option value="">Select User</option>
       </select>
-      <div id="chatBox" class="chat-box"></div>
+      <div id="chatBox"></div>
       <input type="text" id="chatInput" placeholder="Type a message...">
       <button id="sendBtn">Send</button>
-    </div>
-  </div>
+    </section>
+  </main>
 
   <script type="module" src="app.js"></script>
 </body>
