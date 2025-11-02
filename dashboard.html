@@ -1,96 +1,93 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>LaamSocial Dashboard</title>
-<link rel="stylesheet" href="style.css">
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1.0" />
+<title>LaamSocial Dashboard - Auth</title>
+<link rel="stylesheet" href="style.css" />
 </head>
 <body>
+  <header>
+    <h2>LaamSocial</h2>
+    <div>
+      <span id="userNameDisplay"></span>
+      <button id="logoutBtn" style="display:none;">Logout</button>
+    </div>
+  </header>
 
-<header>
-  <h2>LaamSocial</h2>
-  <div>
-    <span id="userNameDisplay"></span>
-    <button id="logoutBtn">Logout</button>
+  <div class="auth-wrap">
+    <div class="card">
+      <h3>Register</h3>
+      <input id="regFullName" placeholder="Full name" />
+      <input id="regUsername" placeholder="Username (unique)" />
+      <input id="regEmail" placeholder="Email" />
+      <input id="regPassword" type="password" placeholder="Password (min 6 chars)" />
+      <button id="registerBtn">Register</button>
+      <div class="small" id="regMsg"></div>
+    </div>
+
+    <div class="card">
+      <h3>Login</h3>
+      <input id="loginIdentifier" placeholder="Email or Username" />
+      <input id="loginPassword" type="password" placeholder="Password" />
+      <button id="loginBtn">Login</button>
+      <div class="small" id="loginMsg"></div>
+    </div>
   </div>
-</header>
 
-<div class="container-dashboard">
-  <!-- Sidebar / Menu -->
-  <nav class="sidebar">
-    <ul>
-      <li id="menuHome">Home</li>
-      <li id="menuFriends">Friends</li>
-      <li id="menuMessages">Messages</li>
-      <li id="menuNotifications">Notifications</li>
-      <li id="menuProfile">Profile / Settings</li>
-    </ul>
-  </nav>
+  <main class="container-dashboard" style="display:none;">
+    <!-- Sidebar / Menu -->
+    <nav class="sidebar">
+      <ul>
+        <li id="menuHome">Home</li>
+        <li id="menuFriends">Friends</li>
+        <li id="menuMessages">Messages</li>
+        <li id="menuNotifications">Notifications</li>
+        <li id="menuProfile">Profile / Settings</li>
+      </ul>
+    </nav>
 
-  <!-- Main Content Sections -->
-  <main class="main-content">
-    <!-- Home Feed -->
-    <section id="homeSection">
-      <h3>Home Feed</h3>
-      <textarea id="postText" placeholder="What's on your mind?"></textarea>
-      <button id="postBtn">Post</button>
-      <div id="feed">Loading posts...</div>
-    </section>
+    <!-- Main Content Sections -->
+    <main class="main-content">
+      <!-- Home Feed -->
+      <section id="homeSection">
+        <h3>Home Feed</h3>
+        <textarea id="postText" placeholder="What's on your mind?"></textarea>
+        <button id="postBtn">Post</button>
+        <div id="feed">Loading posts...</div>
+      </section>
 
-    <!-- Friends -->
-    <section id="friendsSection" style="display:none;">
-      <h3>Friends</h3>
-      <div id="friendsList">Loading users...</div>
-    </section>
+      <!-- Friends -->
+      <section id="friendsSection" style="display:none;">
+        <h3>Friends</h3>
+        <div id="friendsList">Loading users...</div>
+      </section>
 
-    <!-- Messages -->
-    <section id="messagesSection" style="display:none;">
-      <h3>Messages</h3>
-      <select id="chatUserSelect"><option value="">Select User</option></select>
-      <div id="chatBox"></div>
-      <input type="text" id="chatInput" placeholder="Type a message...">
-      <button id="sendBtn">Send</button>
-    </section>
+      <!-- Messages -->
+      <section id="messagesSection" style="display:none;">
+        <h3>Messages</h3>
+        <select id="chatUserSelect"><option value="">Select User</option></select>
+        <div id="chatBox"></div>
+        <input type="text" id="chatInput" placeholder="Type a message..." />
+        <button id="sendBtn">Send</button>
+      </section>
 
-    <!-- Notifications -->
-    <section id="notificationsSection" style="display:none;">
-      <h3>Notifications</h3>
-      <div id="notificationsList">No notifications yet.</div>
-    </section>
+      <!-- Notifications -->
+      <section id="notificationsSection" style="display:none;">
+        <h3>Notifications</h3>
+        <div id="notificationsList">No notifications yet.</div>
+      </section>
 
-    <!-- Profile -->
-    <section id="profileSection" style="display:none;">
-      <h3>Profile / Settings</h3>
-      <p>Full Name: <span id="profileFullName"></span></p>
-      <p>Username: <span id="profileUsername"></span></p>
-      <p>Last Seen: <span id="lastSeen"></span></p>
-    </section>
+      <!-- Profile -->
+      <section id="profileSection" style="display:none;">
+        <h3>Profile / Settings</h3>
+        <p>Full Name: <span id="profileFullName"></span></p>
+        <p>Username: <span id="profileUsername"></span></p>
+        <p>Last Seen: <span id="lastSeen"></span></p>
+      </section>
+    </main>
   </main>
-</div>
 
 <script type="module" src="app.js"></script>
-<script>
-  // Menu Navigation
-  const sections = {
-    home: document.getElementById("homeSection"),
-    friends: document.getElementById("friendsSection"),
-    messages: document.getElementById("messagesSection"),
-    notifications: document.getElementById("notificationsSection"),
-    profile: document.getElementById("profileSection")
-  };
-
-  function showSection(sectionName){
-    for(const key in sections){
-      sections[key].style.display = (key === sectionName) ? "block" : "none";
-    }
-  }
-
-  document.getElementById("menuHome").addEventListener("click", ()=> showSection("home"));
-  document.getElementById("menuFriends").addEventListener("click", ()=> showSection("friends"));
-  document.getElementById("menuMessages").addEventListener("click", ()=> showSection("messages"));
-  document.getElementById("menuNotifications").addEventListener("click", ()=> showSection("notifications"));
-  document.getElementById("menuProfile").addEventListener("click", ()=> showSection("profile"));
-</script>
 </body>
 </html>
