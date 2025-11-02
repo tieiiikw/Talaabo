@@ -1,4 +1,11 @@
-<style>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LaamSocial - Facebook Style Navigation</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
     /* Reset and Base Styles */
     * {
       margin: 0;
@@ -577,3 +584,291 @@
       }
     }
   </style>
+</head>
+<body>
+  <header>
+    <div class="logo">
+      <i class="fas fa-users"></i>
+      <span>LaamSocial</span>
+    </div>
+    <div class="header-right">
+      <div class="user-info">
+        <div class="user-avatar">A</div>
+        <span id="userEmail">ahmednuur@gmail.com</span>
+      </div>
+      <button id="logoutBtn">Logout</button>
+    </div>
+  </header>
+
+  <!-- Horizontal Navigation -->
+  <nav>
+    <div class="nav-container">
+      <ul class="nav-links">
+        <li class="active"><i class="fas fa-home"></i> <span>Home</span></li>
+        <li><i class="fas fa-user-friends"></i> <span>Friends</span></li>
+        <li><i class="fas fa-comment-dots"></i> <span>Messages</span></li>
+        <li><i class="fas fa-bell"></i> <span>Notifications</span></li>
+        <li><i class="fas fa-user-circle"></i> <span>Profile</span></li>
+      </ul>
+    </div>
+  </nav>
+
+  <main>
+    <!-- Left Column -->
+    <div class="left-column">
+      <!-- Profile Section -->
+      <section id="profile">
+        <h3>Profile</h3>
+        <img id="profilePicDisplay" src="https://ui-avatars.com/api/?name=Ahmed+Nuur&background=1877f2&color=fff&size=100" alt="Profile Picture">
+        <input type="file" id="profilePicInput" accept="image/*">
+        <p id="profileEmail">ahmednuur@gmail.com</p>
+        <p id="lastSeen">Last seen: 2 hours ago</p>
+      </section>
+      
+      <!-- Shortcuts Section -->
+      <section id="shortcuts">
+        <h3>Shortcuts</h3>
+        <ul>
+          <li><i class="fas fa-user-friends"></i> Friends</li>
+          <li><i class="fas fa-users"></i> Groups</li>
+          <li><i class="fas fa-store"></i> Marketplace</li>
+          <li><i class="fas fa-video"></i> Watch</li>
+          <li><i class="fas fa-history"></i> Memories</li>
+          <li><i class="fas fa-bookmark"></i> Saved</li>
+        </ul>
+      </section>
+    </div>
+
+    <!-- Center Column -->
+    <div class="center-column">
+      <!-- Post Section -->
+      <section id="postSection">
+        <h3>Create Post</h3>
+        <textarea id="postText" placeholder="What's on your mind?"></textarea>
+        <div class="post-actions">
+          <div class="file-input-wrapper">
+            <input type="file" id="postImage" accept="image/*">
+            <button class="file-input-button">
+              <i class="fas fa-image"></i> Photo
+            </button>
+          </div>
+          <button id="postBtn">Post</button>
+        </div>
+      </section>
+
+      <!-- Feed Section -->
+      <section id="feedSection">
+        <h3>Home Feed</h3>
+        <div id="feed">
+          <!-- Sample posts -->
+          <div class="post">
+            <div class="post-header">
+              <div class="post-avatar">A</div>
+              <div>
+                <div class="post-author">ahmednuur@gmail.com</div>
+                <div class="post-time">2 hours ago</div>
+              </div>
+            </div>
+            <div class="post-content">
+              Walaalayaal
+            </div>
+            <div class="post-actions">
+              <div class="post-action">
+                <i class="far fa-thumbs-up"></i> Like
+              </div>
+              <div class="post-action">
+                <i class="far fa-comment"></i> Comment
+              </div>
+              <div class="post-action">
+                <i class="far fa-share-square"></i> Share
+              </div>
+            </div>
+          </div>
+          
+          <div class="post">
+            <div class="post-header">
+              <div class="post-avatar">A</div>
+              <div>
+                <div class="post-author">ahmednuur@gmail.com</div>
+                <div class="post-time">5 hours ago</div>
+              </div>
+            </div>
+            <div class="post-content">
+              Asc
+            </div>
+            <div class="post-actions">
+              <div class="post-action">
+                <i class="far fa-thumbs-up"></i> Like
+              </div>
+              <div class="post-action">
+                <i class="far fa-comment"></i> Comment
+              </div>
+              <div class="post-action">
+                <i class="far fa-share-square"></i> Share
+              </div>
+            </div>
+          </div>
+          
+          <div class="post">
+            <div class="post-header">
+              <div class="post-avatar">A</div>
+              <div>
+                <div class="post-author">ahmednuur@gmail.com</div>
+                <div class="post-time">1 day ago</div>
+              </div>
+            </div>
+            <div class="post-content">
+              Wadanku shaqo maleh haloo yeeloo
+            </div>
+            <div class="post-actions">
+              <div class="post-action">
+                <i class="far fa-thumbs-up"></i> Like
+              </div>
+              <div class="post-action">
+                <i class="far fa-comment"></i> Comment
+              </div>
+              <div class="post-action">
+                <i class="far fa-share-square"></i> Share
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <!-- Right Column -->
+    <div class="right-column">
+      <!-- Contacts Section -->
+      <section id="contacts">
+        <h3>Contacts</h3>
+        <div class="contact">
+          <div class="contact-avatar">B</div>
+          <span class="contact-name">Bintt Siyad</span>
+        </div>
+        <div class="contact">
+          <div class="contact-avatar">I</div>
+          <span class="contact-name">Iftah Mohamed</span>
+        </div>
+        <div class="contact">
+          <div class="contact-avatar">M</div>
+          <span class="contact-name">Mohamed Ali</span>
+        </div>
+        <div class="contact">
+          <div class="contact-avatar">F</div>
+          <span class="contact-name">Fadumo Hassan</span>
+        </div>
+        <div class="contact">
+          <div class="contact-avatar">S</div>
+          <span class="contact-name">Sahra Ahmed</span>
+        </div>
+      </section>
+
+      <!-- Chat Section -->
+      <section id="chatSection">
+        <h3>Chat</h3>
+        <select id="chatUserSelect">
+          <option value="">Select User</option>
+          <option value="bintt">Bintt Siyad</option>
+          <option value="iftah">Iftah Mohamed</option>
+          <option value="mohamed">Mohamed Ali</option>
+        </select>
+        <div id="chatBox">
+          <div class="message received">
+            Hi there! How are you?
+          </div>
+          <div class="message sent">
+            I'm good, thanks! How about you?
+          </div>
+          <div class="message received">
+            Doing well. Just checking in to see if you're coming to the event tomorrow.
+          </div>
+        </div>
+        <div class="chat-input-container">
+          <input type="text" id="chatInput" placeholder="Type a message...">
+          <button id="sendBtn">
+            <i class="fas fa-paper-plane"></i>
+          </button>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <script>
+    // Basic functionality for demonstration
+    document.addEventListener('DOMContentLoaded', function() {
+      // Set user email
+      document.getElementById('userEmail').textContent = 'ahmednuur@gmail.com';
+      document.getElementById('profileEmail').textContent = 'ahmednuur@gmail.com';
+      
+      // Logout button functionality
+      document.getElementById('logoutBtn').addEventListener('click', function() {
+        alert('Logging out...');
+      });
+      
+      // Navigation functionality
+      const navItems = document.querySelectorAll('.nav-links li');
+      navItems.forEach(item => {
+        item.addEventListener('click', function() {
+          navItems.forEach(nav => nav.classList.remove('active'));
+          this.classList.add('active');
+        });
+      });
+      
+      // Post button functionality
+      document.getElementById('postBtn').addEventListener('click', function() {
+        const postText = document.getElementById('postText').value;
+        if (postText.trim() !== '') {
+          // Create new post
+          const feed = document.getElementById('feed');
+          const newPost = document.createElement('div');
+          newPost.className = 'post';
+          newPost.innerHTML = `
+            <div class="post-header">
+              <div class="post-avatar">A</div>
+              <div>
+                <div class="post-author">ahmednuur@gmail.com</div>
+                <div class="post-time">Just now</div>
+              </div>
+            </div>
+            <div class="post-content">${postText}</div>
+            <div class="post-actions">
+              <div class="post-action">
+                <i class="far fa-thumbs-up"></i> Like
+              </div>
+              <div class="post-action">
+                <i class="far fa-comment"></i> Comment
+              </div>
+              <div class="post-action">
+                <i class="far fa-share-square"></i> Share
+              </div>
+            </div>
+          `;
+          feed.prepend(newPost);
+          document.getElementById('postText').value = '';
+        }
+      });
+      
+      // Send message functionality
+      document.getElementById('sendBtn').addEventListener('click', function() {
+        const message = document.getElementById('chatInput').value;
+        if (message.trim() !== '') {
+          const chatBox = document.getElementById('chatBox');
+          const newMessage = document.createElement('div');
+          newMessage.className = 'message sent';
+          newMessage.textContent = message;
+          chatBox.appendChild(newMessage);
+          document.getElementById('chatInput').value = '';
+          chatBox.scrollTop = chatBox.scrollHeight;
+        }
+      });
+      
+      // Enter key to send message
+      document.getElementById('chatInput').addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+          document.getElementById('sendBtn').click();
+        }
+      });
+    });
+  </script>
+</body>
+</html>
