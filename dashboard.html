@@ -35,7 +35,7 @@
       <h3>Home Feed</h3>
       <div id="postSection">
         <textarea id="postText" placeholder="What's on your mind?"></textarea>
-        
+        <input type="file" id="postImage" accept="image/*">
         <button id="postBtn">Post</button>
       </div>
       <div id="feed">Loading posts...</div>
@@ -66,7 +66,7 @@
     <section id="profileSection" style="display:none;">
       <h3>Profile / Settings</h3>
       <img id="profilePicDisplay" src="default-profile.png" alt="Profile Picture" style="width:80px;height:80px;border-radius:50%;">
-      
+      <input type="file" id="profilePicInput" accept="image/*">
       <p id="profileEmail"></p>
       <p id="lastSeen"></p>
     </section>
