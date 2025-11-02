@@ -1,12 +1,10 @@
-// firebase.js
-// Firebase modular v12.5.0 initialization with updated API key
-
+// firebase.js - Final version
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.5.0/firebase-app.js";
 import { getAuth } from "https://www.gstatic.com/firebasejs/12.5.0/firebase-auth.js";
 import { getFirestore } from "https://www.gstatic.com/firebasejs/12.5.0/firebase-firestore.js";
 import { getStorage } from "https://www.gstatic.com/firebasejs/12.5.0/firebase-storage.js";
 
-// Updated Firebase configuration
+// Firebase configuration – latest API key
 const firebaseConfig = {
   apiKey: "AIzaSyDy_GTVZvwCZp8eLYvd_TUPI-uo_Jp5MpY",
   authDomain: "laamsocial-98cce.firebaseapp.com",
@@ -22,4 +20,4 @@ export const auth = getAuth(app);
 export const db = getFirestore(app);
 export const storage = getStorage(app);
 
-console.log("Firebase initialized successfully with the new API key!");
+console.log("Firebase initialized successfully – LaamSocial Final!");
