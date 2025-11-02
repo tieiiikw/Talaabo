@@ -1,33 +1,39 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>LaamSocial Feed</title>
-  <link rel="stylesheet" href="style.css" />
-
-  <!-- Firebase SDKs -->
-  <script src="https://www.gstatic.com/firebasejs/9.24.0/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.24.0/firebase-auth-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.24.0/firebase-firestore-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.24.0/firebase-storage-compat.js"></script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LaamSocial - Dashboard</title>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
   <div class="container dashboard">
-    <h2>Welcome to LaamSocial!</h2>
+    <div class="top-bar">
+      <h2>LaamSocial</h2>
+      <button id="logoutBtn" class="logout-btn">Logout</button>
+    </div>
+
     <p>Logged in as: <strong id="userEmail"></strong></p>
 
-    <form id="postForm">
+    <div class="post-form">
       <textarea id="postText" placeholder="What's on your mind?" required></textarea>
-      <input type="file" id="postImage" accept="image/*" />
-      <button type="submit">Post</button>
-    </form>
+      <input type="file" id="postImage" accept="image/*">
+      <button id="postBtn">Post</button>
+    </div>
 
     <div class="feed-container" id="feed"></div>
 
-    <button class="logout-btn" id="logoutBtn">Logout</button>
+    <div class="chat-container">
+      <h3>Chat with another user</h3>
+      <select id="chatUserSelect">
+        <option value="">Select User</option>
+      </select>
+      <div id="chatBox" class="chat-box"></div>
+      <input type="text" id="chatInput" placeholder="Type a message...">
+      <button id="sendBtn">Send</button>
+    </div>
   </div>
 
-  <script src="app.js"></script>
+  <script type="module" src="app.js"></script>
 </body>
 </html>
