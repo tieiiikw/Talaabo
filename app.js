@@ -3,7 +3,7 @@ import {
   onAuthStateChanged, signOut
 } from "https://www.gstatic.com/firebasejs/12.5.0/firebase-auth.js";
 import {
-  collection, addDoc, getDocs, serverTimestamp, query, orderBy
+  collection, addDoc, getDocs, serverTimestamp, query, orderBy, onSnapshot
 } from "https://www.gstatic.com/firebasejs/12.5.0/firebase-firestore.js";
 import {
   ref, uploadBytes, getDownloadURL
@@ -22,14 +22,15 @@ const chatInput = document.getElementById("chatInput");
 const sendBtn = document.getElementById("sendBtn");
 
 let currentUserEmail = "";
+let unsubscribeChat = null;
 
 // Auth state
 onAuthStateChanged(auth, async (user) => {
   if (user) {
     currentUserEmail = user.email;
     userEmail.textContent = currentUserEmail;
-    loadFeed();
-    loadUsers();
+    await loadFeed();
+    await loadUsers();
   } else {
     window.location.href = "index.html";
   }
@@ -37,6 +38,7 @@ onAuthStateChanged(auth, async (user) => {
 
 // Logout
 logoutBtn.addEventListener("click", async () => {
+  if (unsubscribeChat) unsubscribeChat();
   await signOut(auth);
   window.location.href = "index.html";
 });
@@ -108,21 +110,34 @@ sendBtn.addEventListener("click", async () => {
   });
 
   chatInput.value = "";
-  loadChat(toUser);
 });
 
-// Load Chat
-async function loadChat(toUser) {
-  chatBox.innerHTML = "";
-  const snapshot = await getDocs(collection(db, "chats"));
-  snapshot.forEach(doc => {
-    const chat = doc.data();
-    if((chat.from === currentUserEmail && chat.to === toUser) ||
-       (chat.from === toUser && chat.to === currentUserEmail)){
-      const div = document.createElement("div");
-      div.className = `chat-message ${chat.from === currentUserEmail ? "self" : ""}`;
-      div.textContent = `${chat.from}: ${chat.message}`;
-      chatBox.appendChild(div);
-    }
+// Chat user select change → setup live listener
+chatUserSelect.addEventListener("change", () => {
+  const toUser = chatUserSelect.value;
+  if(unsubscribeChat) unsubscribeChat(); // remove previous listener
+  if(!toUser) {
+    chatBox.innerHTML = "";
+    return;
+  }
+
+  const chatsQuery = query(
+    collection(db, "chats"),
+    orderBy("createdAt")
+  );
+
+  unsubscribeChat = onSnapshot(chatsQuery, (snapshot) => {
+    chatBox.innerHTML = "";
+    snapshot.forEach(doc => {
+      const chat = doc.data();
+      if((chat.from === currentUserEmail && chat.to === toUser) ||
+         (chat.from === toUser && chat.to === currentUserEmail)){
+        const div = document.createElement("div");
+        div.className = `chat-message ${chat.from === currentUserEmail ? "self" : ""}`;
+        div.textContent = `${chat.from}: ${chat.message}`;
+        chatBox.appendChild(div);
+        chatBox.scrollTop = chatBox.scrollHeight;
+      }
+    });
   });
-}
+});
