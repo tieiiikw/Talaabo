@@ -1,29 +1,3 @@
- body {
-    font-family: Arial, sans-serif;
-    margin: 0;
-    background: #f4f4f4;
-  }/* Tabs/Menu */
-.tabs {
-display: flex;
-justify-content: space-around;
-background: #333;
-padding: 10px 0;
-}
-
-.tab {
-color: white;
-padding: 10px 20px;
-border-radius: 5px;
-cursor: pointer;
-}
-
-/* Assign different colors */
-.home { background: #3498db; }
-.friends { background: #2ecc71; }
-.messages { background: #e67e22; }
-.notifications { background: #9b59b6; }
-.profile { background: #e74c3c; }
-
 /* Chat box */
 .chat-container {
 display: none;
