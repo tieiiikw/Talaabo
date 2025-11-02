@@ -1,10 +1,7 @@
 body {
   font-family: 'Segoe UI', sans-serif;
   background: linear-gradient(135deg, #7f00ff, #e100ff);
-  height: 100vh;
-  display: flex;
-  justify-content: center;
-  align-items: center;
+  min-height: 100vh;
   margin: 0;
 }
 
@@ -13,9 +10,10 @@ body {
   border-radius: 15px;
   box-shadow: 0 0 15px rgba(0,0,0,0.1);
   width: 90%;
-  max-width: 350px;
+  max-width: 400px;
   padding: 30px;
   text-align: center;
+  margin: 40px auto;
 }
 
 h2 {
@@ -23,13 +21,18 @@ h2 {
   color: #7f00ff;
 }
 
-input {
+input, textarea {
   width: 100%;
   padding: 12px;
   margin: 8px 0;
   border: 1px solid #ccc;
   border-radius: 8px;
   outline: none;
+}
+
+textarea {
+  height: 80px;
+  resize: none;
 }
 
 button {
@@ -59,7 +62,7 @@ button.alt {
   font-size: 0.9rem;
 }
 
-/* Dashboard page */
+/* Dashboard + Feed */
 .dashboard {
   text-align: center;
   color: #333;
@@ -71,4 +74,22 @@ button.alt {
 }
 .logout-btn:hover {
   background: #d93636;
+}
+
+.feed-container {
+  margin-top: 25px;
+}
+
+.post-card {
+  background: #f7f7f7;
+  padding: 10px;
+  border-radius: 10px;
+  text-align: left;
+  margin-bottom: 10px;
+}
+
+.post-card img {
+  width: 100%;
+  border-radius: 8px;
+  margin-top: 5px;
 }
