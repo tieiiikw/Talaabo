@@ -1,245 +1,205 @@
-// app.js
-import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
+import { auth, db, storage } from './firebase.js';
 import {
-  getAuth,
-  createUserWithEmailAndPassword,
-  signInWithEmailAndPassword,
-  signOut,
-  onAuthStateChanged,
-  updateProfile
-} from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
+  onAuthStateChanged, signOut
+} from "https://www.gstatic.com/firebasejs/12.5.0/firebase-auth.js";
 import {
-  getFirestore,
-  doc,
-  setDoc,
-  getDoc,
-  collection,
-  query,
-  where,
-  getDocs,
-  serverTimestamp,
-  updateDoc
-} from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
+  collection, addDoc, getDocs, serverTimestamp, query, orderBy, onSnapshot, updateDoc, where
+} from "https://www.gstatic.com/firebasejs/12.5.0/firebase-firestore.js";
+import {
+  ref, uploadBytes, getDownloadURL
+} from "https://www.gstatic.com/firebasejs/12.5.0/firebase-storage.js";
 
-// TODO: REPLACE WITH YOUR FIREBASE CONFIG
-const firebaseConfig = {
-  apiKey: "REPLACE_ME",
-  authDomain: "REPLACE_ME",
-  projectId: "REPLACE_ME",
-  storageBucket: "REPLACE_ME",
-  messagingSenderId: "REPLACE_ME",
-  appId: "REPLACE_ME"
-};
-
-const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
-const db = getFirestore(app);
-
-/* UI elements */
-const registerBtn = document.getElementById("registerBtn");
-const regFullName = document.getElementById("regFullName");
-const regUsername = document.getElementById("regUsername");
-const regEmail = document.getElementById("regEmail");
-const regPassword = document.getElementById("regPassword");
-const regMsg = document.getElementById("regMsg");
-
-const loginBtn = document.getElementById("loginBtn");
-const loginIdentifier = document.getElementById("loginIdentifier");
-const loginPassword = document.getElementById("loginPassword");
-const loginMsg = document.getElementById("loginMsg");
-
+// DOM Elements
+const userEmail = document.getElementById("userEmail");
 const logoutBtn = document.getElementById("logoutBtn");
-const userNameDisplay = document.getElementById("userNameDisplay");
-
-const authArea = document.querySelector(".auth-wrap");
-const dashboardArea = document.querySelector(".container-dashboard");
-
-/* helpers */
-function showMessage(el, msg, success = true) {
-  el.textContent = msg;
-  el.style.color = success ? "green" : "crimson";
-  setTimeout(()=> { el.textContent = ""; }, 5000);
-}
-
-async function isUsernameTaken(username) {
-  const docRef = doc(db, "usernames", username.toLowerCase());
-  const snap = await getDoc(docRef);
-  return snap.exists();
-}
-
-/* Registration flow */
-registerBtn.addEventListener("click", async () => {
-  const fullName = regFullName.value.trim();
-  const username = regUsername.value.trim();
-  const email = regEmail.value.trim();
-  const password = regPassword.value;
-
-  if (!fullName || !username || !email || password.length < 6) {
-    showMessage(regMsg, "Fadlan buuxi dhammaan goobaha. Password min 6 chars.", false);
-    return;
-  }
-
-  try {
-    // check username availability
-    const unameLower = username.toLowerCase();
-    const unameRef = doc(db, "usernames", unameLower);
-    const unameSnap = await getDoc(unameRef);
-    if (unameSnap.exists()) {
-      showMessage(regMsg, "Username la isticmaalay. Fadlan dooro mid kale.", false);
-      return;
-    }
-
-    // create user in Firebase Auth
-    const userCred = await createUserWithEmailAndPassword(auth, email, password);
-    const user = userCred.user;
-
-    // set profile displayName
-    await updateProfile(user, { displayName: username });
-
-    // create user doc
-    const userDocRef = doc(db, "users", user.uid);
-    await setDoc(userDocRef, {
-      uid: user.uid,
-      email,
-      username: unameLower,
-      fullName,
-      createdAt: serverTimestamp(),
-      lastSeen: serverTimestamp()
-    });
-
-    // set username mapping document (username -> email + uid)
-    await setDoc(unameRef, {
-      uid: user.uid,
-      email
-    });
-
-    showMessage(regMsg, "Registration successful! You are logged in.");
-  } catch (err) {
-    console.error(err);
-    showMessage(regMsg, "Error: " + (err.message || err.code), false);
-  }
-});
-
-/* Login flow (email or username) */
-loginBtn.addEventListener("click", async () => {
-  const identifier = loginIdentifier.value.trim();
-  const password = loginPassword.value;
-  if (!identifier || !password) {
-    showMessage(loginMsg, "Gali email/username iyo password", false);
-    return;
-  }
-
-  try {
-    let emailToLogin = identifier;
-    // if identifier doesn't look like email, try to map username -> email
-    if (!identifier.includes("@")) {
-      const unameLower = identifier.toLowerCase();
-      const unameRef = doc(db, "usernames", unameLower);
-      const unameSnap = await getDoc(unameRef);
-      if (!unameSnap.exists()) {
-        showMessage(loginMsg, "Username ma jiro.", false);
-        return;
-      }
-      const data = unameSnap.data();
-      emailToLogin = data.email;
-    }
-
-    // sign in with email
-    await signInWithEmailAndPassword(auth, emailToLogin, password);
-    showMessage(loginMsg, "Logged in!");
-  } catch (err) {
-    console.error(err);
-    showMessage(loginMsg, "Login failed: " + (err.message || err.code), false);
-  }
-});
-
-/* Logout */
-logoutBtn.addEventListener("click", async () => {
-  await signOut(auth);
-});
-
-/* Auth state observer */
-onAuthStateChanged(auth, async (user) => {
-  if (user) {
-    // show dashboard
-    authArea.style.display = "none";
-    dashboardArea.style.display = "flex";
-    logoutBtn.style.display = "inline-block";
-
-    // load user profile from Firestore
-    try {
-      const userDocRef = doc(db, "users", user.uid);
-      const userSnap = await getDoc(userDocRef);
-      if (userSnap.exists()) {
-        const data = userSnap.data();
-        userNameDisplay.textContent = data.username || user.displayName || user.email;
-        document.getElementById("profileFullName").textContent = data.fullName || "";
-        document.getElementById("profileUsername").textContent = data.username || "";
-        if (data.lastSeen && data.lastSeen.toDate) {
-          document.getElementById("lastSeen").textContent = data.lastSeen.toDate().toLocaleString();
-        } else {
-          document.getElementById("lastSeen").textContent = "Just now";
-        }
-
-        // update lastSeen timestamp
-        await updateDoc(userDocRef, { lastSeen: serverTimestamp() });
-      } else {
-        userNameDisplay.textContent = user.displayName || user.email;
-      }
-    } catch (err) {
-      console.error("Load profile error:", err);
-    }
-  } else {
-    // show auth forms
-    authArea.style.display = "flex";
-    dashboardArea.style.display = "none";
-    logoutBtn.style.display = "none";
-    userNameDisplay.textContent = "";
-  }
-});
-
-/* Menu Navigation (existing code adapted) */
-const sections = {
-  home: document.getElementById("homeSection"),
-  friends: document.getElementById("friendsSection"),
-  messages: document.getElementById("messagesSection"),
-  notifications: document.getElementById("notificationsSection"),
-  profile: document.getElementById("profileSection")
-};
-
-function showSection(sectionName){
-  for(const key in sections){
-    sections[key].style.display = (key === sectionName) ? "block" : "none";
-  }
-}
-
-document.getElementById("menuHome").addEventListener("click", ()=> showSection("home"));
-document.getElementById("menuFriends").addEventListener("click", ()=> showSection("friends"));
-document.getElementById("menuMessages").addEventListener("click", ()=> showSection("messages"));
-document.getElementById("menuNotifications").addEventListener("click", ()=> showSection("notifications"));
-document.getElementById("menuProfile").addEventListener("click", ()=> showSection("profile"));
-
-/* Basic posting (example storing posts in Firestore) */
 const postBtn = document.getElementById("postBtn");
 const postText = document.getElementById("postText");
+const postImage = document.getElementById("postImage");
 const feed = document.getElementById("feed");
 
-postBtn.addEventListener("click", async () => {
-  const text = postText.value.trim();
-  const user = auth.currentUser;
-  if (!user) { alert("Login first"); return; }
-  if (!text) return;
-  try {
-    const postsRef = collection(db, "posts");
-    await setDoc(doc(postsRef), {
-      authorUid: user.uid,
-      content: text,
-      createdAt: serverTimestamp()
-    });
-    postText.value = "";
-    feed.textContent = "Post submitted!";
-  } catch(err) {
-    console.error(err);
-    feed.textContent = "Failed to submit post.";
+const chatUserSelect = document.getElementById("chatUserSelect");
+const chatBox = document.getElementById("chatBox");
+const chatInput = document.getElementById("chatInput");
+const sendBtn = document.getElementById("sendBtn");
+
+const profileEmail = document.getElementById("profileEmail");
+const lastSeenEl = document.getElementById("lastSeen");
+const profilePicInput = document.getElementById("profilePicInput");
+const profilePicDisplay = document.getElementById("profilePicDisplay");
+
+let currentUserEmail = "";
+let unsubscribeChat = null;
+
+// -------- Auth State --------
+onAuthStateChanged(auth, async (user) => {
+  if (user) {
+    currentUserEmail = user.email;
+    userEmail.textContent = currentUserEmail;
+    profileEmail.textContent = currentUserEmail;
+
+    // Add user to users collection if not exists
+    const usersSnapshot = await getDocs(collection(db, "users"));
+    let userDoc = usersSnapshot.docs.find(doc => doc.data().email === currentUserEmail);
+    if(!userDoc){
+      userDoc = await addDoc(collection(db, "users"), { email: currentUserEmail, lastSeen: serverTimestamp(), profilePic: "" });
+    } else {
+      // update last seen
+      await updateDoc(userDoc.ref, { lastSeen: serverTimestamp() });
+      if(userDoc.data().profilePic){
+        profilePicDisplay.src = userDoc.data().profilePic;
+      }
+    }
+
+    loadFeed();
+    loadUsers();
+  } else {
+    window.location.href = "index.html";
   }
 });
+
+// -------- Logout --------
+logoutBtn.addEventListener("click", async () => {
+  if(unsubscribeChat) unsubscribeChat();
+  await signOut(auth);
+  window.location.href = "index.html";
+});
+
+// -------- Profile Picture Upload --------
+profilePicInput.addEventListener("change", async () => {
+  const file = profilePicInput.files[0];
+  if(!file) return;
+
+  const fileRef = ref(storage, `profilePics/${currentUserEmail}_${Date.now()}_${file.name}`);
+  await uploadBytes(fileRef, file);
+  const url = await getDownloadURL(fileRef);
+
+  // Update user doc
+  const usersSnapshot = await getDocs(collection(db, "users"));
+  const userDoc = usersSnapshot.docs.find(doc => doc.data().email === currentUserEmail);
+  await updateDoc(userDoc.ref, { profilePic: url });
+  profilePicDisplay.src = url;
+});
+
+// -------- Post functionality --------
+postBtn.addEventListener("click", async () => {
+  let text = postText.value.trim();
+  let file = postImage.files[0];
+  let imageUrl = "";
+
+  if (file) {
+    const fileRef = ref(storage, `posts/${Date.now()}_${file.name}`);
+    await uploadBytes(fileRef, file);
+    imageUrl = await getDownloadURL(fileRef);
+  }
+
+  await addDoc(collection(db, "posts"), {
+    user: currentUserEmail,
+    text,
+    imageUrl,
+    createdAt: serverTimestamp()
+  });
+
+  postText.value = "";
+  postImage.value = "";
+  loadFeed();
+});
+
+// -------- Load Feed --------
+async function loadFeed(filterUser=null) {
+  feed.innerHTML = "<p>Loading posts...</p>";
+  let q;
+  if(filterUser){
+    q = query(collection(db, "posts"), where("user","==",filterUser), orderBy("createdAt"));
+  } else {
+    q = query(collection(db, "posts"), orderBy("createdAt", "desc"));
+  }
+
+  const snapshot = await getDocs(q);
+  feed.innerHTML = "";
+  snapshot.forEach(doc => {
+    const post = doc.data();
+    const div = document.createElement("div");
+    div.className = "post-card";
+    div.innerHTML = `<p><strong>${post.user}</strong></p>
+                     <p>${post.text || ""}</p>
+                     ${post.imageUrl ? `<img src="${post.imageUrl}"/>` : ""}`;
+    feed.appendChild(div);
+  });
+}
+
+// -------- Load Users for chat --------
+async function loadUsers() {
+  const snapshot = await getDocs(collection(db, "users"));
+  chatUserSelect.innerHTML = `<option value="">Select User</option>`;
+  snapshot.forEach(doc => {
+    const email = doc.data().email;
+    if(email !== currentUserEmail){
+      chatUserSelect.innerHTML += `<option value="${email}">${email}</option>`;
+    }
+  });
+}
+
+// -------- Chat functionality --------
+chatUserSelect.addEventListener("change", () => {
+  const toUser = chatUserSelect.value;
+
+  if(unsubscribeChat) unsubscribeChat(); // remove previous listener
+  if(!toUser){
+    chatBox.innerHTML = "";
+    return;
+  }
+
+  const chatsQuery = query(collection(db, "chats"), orderBy("createdAt"));
+
+  unsubscribeChat = onSnapshot(chatsQuery, async (snapshot) => {
+    chatBox.innerHTML = "";
+
+    for(const doc of snapshot.docs){
+      const chat = doc.data();
+      if((chat.from === currentUserEmail && chat.to === toUser) ||
+         (chat.from === toUser && chat.to === currentUserEmail)){
+
+        // Update seen status
+        if(chat.to === currentUserEmail && chat.seen === false){
+          await updateDoc(doc.ref, { seen: true });
+          // Browser notification
+          if(Notification.permission === "granted"){
+            new Notification(`New message from ${chat.from}`, {
+              body: chat.message
+            });
+          }
+        }
+
+        const div = document.createElement("div");
+        div.className = `chat-message ${chat.from === currentUserEmail ? "self" : ""}`;
+        div.textContent = `${chat.from}: ${chat.message}`;
+        chatBox.appendChild(div);
+        chatBox.scrollTop = chatBox.scrollHeight;
+      }
+    }
+  });
+});
+
+// Send chat message
+sendBtn.addEventListener("click", async () => {
+  const toUser = chatUserSelect.value;
+  const message = chatInput.value.trim();
+  if(!toUser || !message) return;
+
+  await addDoc(collection(db, "chats"), {
+    from: currentUserEmail,
+    to: toUser,
+    message,
+    createdAt: serverTimestamp(),
+    seen: false
+  });
+
+  chatInput.value = "";
+});
+
+// -------- Notification permission --------
+if("Notification" in window){
+  Notification.requestPermission().then(permission => {
+    console.log("Notification permission:", permission);
+  });
+}
