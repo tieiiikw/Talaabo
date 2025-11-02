@@ -1,91 +1,169 @@
-body {
-  font-family: 'Segoe UI', sans-serif;
-  background: linear-gradient(135deg, #7f00ff, #e100ff);
-  min-height: 100vh;
+/* General reset */
+* {
+  box-sizing: border-box;
   margin: 0;
+  padding: 0;
+  font-family: 'Segoe UI', sans-serif;
 }
 
-.container {
-  background: white;
-  border-radius: 15px;
-  box-shadow: 0 0 20px rgba(0,0,0,0.15);
-  width: 95%;
-  max-width: 600px;
-  margin: 20px auto;
-  padding: 20px;
+body {
+  background-color: #f0f2f5;
+  color: #050505;
+  line-height: 1.5;
 }
 
-.top-bar {
+header {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  background-color: #1877f2;
+  color: white;
+  padding: 10px 20px;
 }
 
-h2, h3 {
-  color: #7f00ff;
-  margin: 10px 0;
+header h2 {
+  font-size: 1.5rem;
 }
 
-input, textarea, select {
-  width: 100%;
-  padding: 10px;
-  margin: 5px 0;
-  border-radius: 8px;
-  border: 1px solid #ccc;
-  outline: none;
-}
-
-textarea { resize: none; height: 70px; }
-
-button {
-  width: 100%;
-  padding: 12px;
-  margin-top: 5px;
+header button {
+  padding: 5px 12px;
   border: none;
-  border-radius: 8px;
+  border-radius: 5px;
+  background-color: white;
+  color: #1877f2;
   cursor: pointer;
   font-weight: bold;
-  background: #7f00ff;
-  color: white;
 }
 
-button:hover { background: #5d00cc; }
-
-.logout-btn { background: #ff4d4d; }
-.logout-btn:hover { background: #d93636; }
-
-.feed-container {
-  margin-top: 20px;
+main {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  padding: 20px;
 }
 
-.post-card {
-  background: #f7f7f7;
-  padding: 12px;
-  border-radius: 10px;
+/* Profile section */
+#profile {
+  flex: 1 1 200px;
+  background-color: white;
+  padding: 15px;
+  margin-bottom: 20px;
+  border-radius: 8px;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+/* Post Section */
+#postSection {
+  flex: 2 1 500px;
+  background-color: white;
+  padding: 15px;
+  margin-bottom: 20px;
+  border-radius: 8px;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+#postText {
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 10px;
+  resize: vertical;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+}
+
+#postSection input[type="file"] {
   margin-bottom: 10px;
 }
 
+#postBtn {
+  background-color: #1877f2;
+  color: white;
+  border: none;
+  padding: 8px 15px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+/* Feed Section */
+#feedSection {
+  flex: 2 1 500px;
+  margin-bottom: 20px;
+}
+
+.post-card {
+  background-color: white;
+  margin-bottom: 15px;
+  padding: 10px 15px;
+  border-radius: 8px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
 .post-card img {
-  width: 100%;
-  border-radius: 8px;
-  margin-top: 5px;
+  max-width: 100%;
+  margin-top: 10px;
+  border-radius: 5px;
 }
 
-.chat-container {
-  margin-top: 20px;
-  border-top: 1px solid #ccc;
-  padding-top: 10px;
+/* Chat Section */
+#chatSection {
+  flex: 1 1 300px;
+  background-color: white;
+  padding: 15px;
+  border-radius: 8px;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+  display: flex;
+  flex-direction: column;
 }
 
-.chat-box {
-  background: #f2f2f2;
-  border-radius: 8px;
-  min-height: 120px;
+#chatBox {
+  height: 300px;
   overflow-y: auto;
-  padding: 10px;
-  margin: 5px 0;
+  margin-bottom: 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  padding: 5px;
+  background-color: #f9f9f9;
 }
+
 .chat-message {
-  margin-bottom: 8px;
+  margin: 5px 0;
+  padding: 5px 8px;
+  border-radius: 5px;
+  max-width: 80%;
+  background-color: #e4e6eb;
 }
-.chat-message.self { text-align: right; }
+
+.chat-message.self {
+  background-color: #1877f2;
+  color: white;
+  align-self: flex-end;
+}
+
+#chatSection input[type="text"] {
+  padding: 8px;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+  margin-bottom: 5px;
+}
+
+#chatSection button {
+  background-color: #1877f2;
+  color: white;
+  border: none;
+  padding: 8px 10px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+/* Responsive */
+@media (max-width: 1024px){
+  main {
+    flex-direction: column;
+  }
+
+  #profile, #postSection, #feedSection, #chatSection {
+    flex: 1 1 100%;
+  }
+}
