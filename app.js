@@ -1,20 +1,13 @@
-import { auth, db, storage } from './firebase.js';
-import {
-  onAuthStateChanged, signOut
-} from "https://www.gstatic.com/firebasejs/12.5.0/firebase-auth.js";
-import {
-  collection, addDoc, getDocs, serverTimestamp, query, orderBy, onSnapshot, updateDoc, where
-} from "https://www.gstatic.com/firebasejs/12.5.0/firebase-firestore.js";
-import {
-  ref, uploadBytes, getDownloadURL
-} from "https://www.gstatic.com/firebasejs/12.5.0/firebase-storage.js";
+import { auth, db } from './firebase.js';
+import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.5.0/firebase-auth.js";
+import { collection, addDoc, getDocs, query, orderBy, serverTimestamp, onSnapshot, updateDoc, doc } from "https://www.gstatic.com/firebasejs/12.5.0/firebase-firestore.js";
 
 // DOM Elements
-const userEmail = document.getElementById("userEmail");
+const userNameDisplay = document.getElementById("userNameDisplay");
 const logoutBtn = document.getElementById("logoutBtn");
+
 const postBtn = document.getElementById("postBtn");
 const postText = document.getElementById("postText");
-const postImage = document.getElementById("postImage");
 const feed = document.getElementById("feed");
 
 const chatUserSelect = document.getElementById("chatUserSelect");
@@ -22,160 +15,129 @@ const chatBox = document.getElementById("chatBox");
 const chatInput = document.getElementById("chatInput");
 const sendBtn = document.getElementById("sendBtn");
 
-const profileEmail = document.getElementById("profileEmail");
-const lastSeenEl = document.getElementById("lastSeen");
-const profilePicInput = document.getElementById("profilePicInput");
-const profilePicDisplay = document.getElementById("profilePicDisplay");
-
 const friendsList = document.getElementById("friendsList");
 const notificationsList = document.getElementById("notificationsList");
 
-let currentUserEmail = "";
+const profileFullName = document.getElementById("profileFullName");
+const profileUsername = document.getElementById("profileUsername");
+const lastSeenEl = document.getElementById("lastSeen");
+
+let currentUser = null;
 let unsubscribeChat = null;
 
 // -------- Auth State --------
-onAuthStateChanged(auth, async (user) => {
+onAuthStateChanged(auth, async (user)=>{
   if(user){
-    currentUserEmail = user.email;
-    userEmail.textContent = currentUserEmail;
-    profileEmail.textContent = currentUserEmail;
-
-    // Add user if not exists
-    const usersSnapshot = await getDocs(collection(db, "users"));
-    let userDoc = usersSnapshot.docs.find(doc => doc.data().email === currentUserEmail);
-    if(!userDoc){
-      userDoc = await addDoc(collection(db, "users"), { email: currentUserEmail, lastSeen: serverTimestamp(), profilePic: "" });
-    } else {
-      await updateDoc(userDoc.ref, { lastSeen: serverTimestamp() });
-      if(userDoc.data().profilePic) profilePicDisplay.src = userDoc.data().profilePic;
+    currentUser = user;
+    // Get user doc from Firestore
+    const snapshot = await getDocs(collection(db,"users"));
+    const userDoc = snapshot.docs.find(doc => doc.data().email === user.email);
+    if(userDoc){
+      currentUser.uid = userDoc.id;
+      currentUser.fullName = userDoc.data().fullName;
+      currentUser.username = userDoc.data().username;
+      // Update lastSeen
+      await updateDoc(doc(db,"users",currentUser.uid),{lastSeen: serverTimestamp()});
     }
+
+    userNameDisplay.textContent = currentUser.username;
+    profileFullName.textContent = currentUser.fullName;
+    profileUsername.textContent = currentUser.username;
 
     loadFeed();
     loadUsers();
     loadNotifications();
   } else {
-    window.location.href = "index.html";
+    window.location.href="index.html";
   }
 });
 
 // -------- Logout --------
-logoutBtn.addEventListener("click", async () => {
+logoutBtn.addEventListener("click", async ()=>{
   if(unsubscribeChat) unsubscribeChat();
   await signOut(auth);
-  window.location.href = "index.html";
+  window.location.href="index.html";
 });
 
-// -------- Profile Picture --------
-profilePicInput.addEventListener("change", async () => {
-  const file = profilePicInput.files[0];
-  if(!file) return;
-  const fileRef = ref(storage, `profilePics/${currentUserEmail}_${Date.now()}_${file.name}`);
-  await uploadBytes(fileRef, file);
-  const url = await getDownloadURL(fileRef);
-  const usersSnapshot = await getDocs(collection(db, "users"));
-  const userDoc = usersSnapshot.docs.find(doc => doc.data().email === currentUserEmail);
-  await updateDoc(userDoc.ref, { profilePic: url });
-  profilePicDisplay.src = url;
-});
+// -------- Post --------
+postBtn.addEventListener("click", async ()=>{
+  const text = postText.value.trim();
+  if(!text) return;
 
-// -------- Post Functionality --------
-postBtn.addEventListener("click", async () => {
-  let text = postText.value.trim();
-  let file = postImage.files[0];
-  let imageUrl = "";
-
-  if(file){
-    const fileRef = ref(storage, `posts/${Date.now()}_${file.name}`);
-    await uploadBytes(fileRef, file);
-    imageUrl = await getDownloadURL(fileRef);
-  }
-
-  await addDoc(collection(db, "posts"), {
-    user: currentUserEmail,
+  await addDoc(collection(db,"posts"),{
+    userId: currentUser.uid,
+    username: currentUser.username,
     text,
-    imageUrl,
     createdAt: serverTimestamp()
   });
-
-  postText.value = "";
-  postImage.value = "";
+  postText.value="";
   loadFeed();
   loadNotifications();
 });
 
 // -------- Load Feed --------
-async function loadFeed(filterUser=null){
-  feed.innerHTML = "<p>Loading posts...</p>";
-  let q;
-  if(filterUser){
-    q = query(collection(db, "posts"), where("user","==",filterUser), orderBy("createdAt"));
-  } else {
-    q = query(collection(db, "posts"), orderBy("createdAt","desc"));
-  }
+async function loadFeed(){
+  const q = query(collection(db,"posts"), orderBy("createdAt","desc"));
   const snapshot = await getDocs(q);
-  feed.innerHTML = "";
-  snapshot.forEach(doc => {
+  feed.innerHTML="";
+  snapshot.forEach(doc=>{
     const post = doc.data();
     const div = document.createElement("div");
-    div.className = "post-card";
-    div.innerHTML = `<p><strong>${post.user}</strong></p>
-                     <p>${post.text || ""}</p>
-                     ${post.imageUrl ? `<img src="${post.imageUrl}"/>` : ""}`;
+    div.className="post-card";
+    div.innerHTML=`<p><strong>${post.username}</strong></p><p>${post.text}</p>`;
     feed.appendChild(div);
   });
 }
 
 // -------- Load Users (Friends) --------
 async function loadUsers(){
-  const snapshot = await getDocs(collection(db, "users"));
-  friendsList.innerHTML = "";
-  chatUserSelect.innerHTML = `<option value="">Select User</option>`;
-  snapshot.forEach(doc => {
-    const email = doc.data().email;
-    if(email !== currentUserEmail){
-      friendsList.innerHTML += `<p>${email}</p>`;
-      chatUserSelect.innerHTML += `<option value="${email}">${email}</option>`;
+  const snapshot = await getDocs(collection(db,"users"));
+  friendsList.innerHTML="";
+  chatUserSelect.innerHTML=`<option value="">Select User</option>`;
+  snapshot.forEach(doc=>{
+    const data = doc.data();
+    if(data.email!==currentUser.email){
+      friendsList.innerHTML+=`<p>${data.username}</p>`;
+      chatUserSelect.innerHTML+=`<option value="${doc.id}">${data.username}</option>`;
     }
   });
 }
 
-// -------- Chat Functionality --------
-chatUserSelect.addEventListener("change", ()=>{
-  const toUser = chatUserSelect.value;
+// -------- Chat --------
+chatUserSelect.addEventListener("change", async ()=>{
+  const toUid = chatUserSelect.value;
   if(unsubscribeChat) unsubscribeChat();
-  if(!toUser){ chatBox.innerHTML=""; return; }
+  chatBox.innerHTML="";
+  if(!toUid) return;
 
-  const chatsQuery = query(collection(db, "chats"), orderBy("createdAt"));
-  unsubscribeChat = onSnapshot(chatsQuery, async snapshot=>{
+  const chatsQuery = query(collection(db,"chats"), orderBy("createdAt"));
+  unsubscribeChat = onSnapshot(chatsQuery, snapshot=>{
     chatBox.innerHTML="";
-    for(const doc of snapshot.docs){
+    snapshot.forEach(doc=>{
       const chat = doc.data();
-      if((chat.from===currentUserEmail && chat.to===toUser) ||
-         (chat.from===toUser && chat.to===currentUserEmail)){
-
-        if(chat.to===currentUserEmail && !chat.seen){
-          await updateDoc(doc.ref, {seen:true});
-          if(Notification.permission==="granted") new Notification(`New message from ${chat.from}`, {body: chat.message});
-        }
-
+      if((chat.from===currentUser.uid && chat.to===toUid) || (chat.from===toUid && chat.to===currentUser.uid)){
         const div = document.createElement("div");
-        div.className = `chat-message ${chat.from===currentUserEmail ? "self" : ""}`;
-        div.textContent = `${chat.from}: ${chat.message}`;
+        div.className=`chat-message ${chat.from===currentUser.uid?"self":""}`;
+        div.textContent=`${chat.fromUsername}: ${chat.message}`;
         chatBox.appendChild(div);
         chatBox.scrollTop = chatBox.scrollHeight;
       }
-    }
+    });
   });
 });
 
 sendBtn.addEventListener("click", async ()=>{
-  const toUser = chatUserSelect.value;
+  const toUid = chatUserSelect.value;
   const message = chatInput.value.trim();
-  if(!toUser || !message) return;
+  if(!toUid || !message) return;
 
-  await addDoc(collection(db, "chats"), {
-    from: currentUserEmail,
-    to: toUser,
+  const toUserDoc = await getDocs(collection(db,"users"));
+  const toUser = toUserDoc.docs.find(d=>d.id===toUid);
+
+  await addDoc(collection(db,"chats"),{
+    from: currentUser.uid,
+    fromUsername: currentUser.username,
+    to: toUid,
     message,
     createdAt: serverTimestamp(),
     seen:false
@@ -186,34 +148,27 @@ sendBtn.addEventListener("click", async ()=>{
 
 // -------- Notifications --------
 async function loadNotifications(){
-  const postsSnapshot = await getDocs(collection(db, "posts"));
-  const chatsSnapshot = await getDocs(collection(db, "chats"));
-  notificationsList.innerHTML = "";
+  notificationsList.innerHTML="";
+  const postsSnapshot = await getDocs(collection(db,"posts"));
+  const chatsSnapshot = await getDocs(collection(db,"chats"));
 
-  // New posts by others
   postsSnapshot.forEach(doc=>{
     const post = doc.data();
-    if(post.user!==currentUserEmail){
+    if(post.userId!==currentUser.uid){
       const div = document.createElement("div");
-      div.textContent = `New post by ${post.user}`;
+      div.textContent=`New post by ${post.username}`;
       notificationsList.appendChild(div);
     }
   });
 
-  // New messages
   chatsSnapshot.forEach(doc=>{
     const chat = doc.data();
-    if(chat.to===currentUserEmail && !chat.seen){
+    if(chat.to===currentUser.uid && !chat.seen){
       const div = document.createElement("div");
-      div.textContent = `New message from ${chat.from}`;
+      div.textContent=`New message from ${chat.fromUsername}`;
       notificationsList.appendChild(div);
     }
   });
 
   if(notificationsList.innerHTML==="") notificationsList.innerHTML="No notifications yet.";
-}
-
-// -------- Notification Permission --------
-if("Notification" in window){
-  Notification.requestPermission().then(permission => console.log("Notification permission:", permission));
 }
