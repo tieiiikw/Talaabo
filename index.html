@@ -28,10 +28,34 @@
     const registerBtn = document.getElementById("registerBtn");
     const message = document.getElementById("message");
 
+    // Email validation function
+    function isValidEmail(email){
+      return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+    }
+
+    // Password validation
+    function isValidPassword(password){
+      return password.length >= 6;
+    }
+
     // Register
     registerBtn.addEventListener("click", async () => {
+      const email = emailInput.value.trim();
+      const password = passwordInput.value.trim();
+
+      if(!isValidEmail(email)){
+        message.style.color = "red";
+        message.textContent = "Please enter a valid email address!";
+        return;
+      }
+      if(!isValidPassword(password)){
+        message.style.color = "red";
+        message.textContent = "Password must be at least 6 characters!";
+        return;
+      }
+
       try {
-        await createUserWithEmailAndPassword(auth, emailInput.value, passwordInput.value);
+        await createUserWithEmailAndPassword(auth, email, password);
         message.style.color = "green";
         message.textContent = "Account created successfully!";
         setTimeout(() => window.location.href = "dashboard.html", 1500);
@@ -43,8 +67,22 @@
 
     // Login
     loginBtn.addEventListener("click", async () => {
+      const email = emailInput.value.trim();
+      const password = passwordInput.value.trim();
+
+      if(!isValidEmail(email)){
+        message.style.color = "red";
+        message.textContent = "Please enter a valid email address!";
+        return;
+      }
+      if(!isValidPassword(password)){
+        message.style.color = "red";
+        message.textContent = "Password must be at least 6 characters!";
+        return;
+      }
+
       try {
-        await signInWithEmailAndPassword(auth, emailInput.value, passwordInput.value);
+        await signInWithEmailAndPassword(auth, email, password);
         message.style.color = "green";
         message.textContent = "Login successful!";
         setTimeout(() => window.location.href = "dashboard.html", 1000);
