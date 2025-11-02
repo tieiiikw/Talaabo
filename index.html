@@ -1,29 +1,58 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>LaamSocial - Login</title>
-  <link rel="stylesheet" href="style.css" />
-
-  <!-- Firebase SDKs -->
-  <script src="https://www.gstatic.com/firebasejs/9.24.0/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.24.0/firebase-auth-compat.js"></script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LaamSocial - Login/Register</title>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
   <div class="container">
     <h2>LaamSocial</h2>
-
     <div class="form">
-      <input type="email" id="email" placeholder="Email" required />
-      <input type="password" id="password" placeholder="Password" required />
+      <input type="email" id="email" placeholder="Email" required>
+      <input type="password" id="password" placeholder="Password" required>
       <button id="loginBtn">Login</button>
       <button id="registerBtn" class="alt">Register</button>
     </div>
-
     <p id="message"></p>
   </div>
 
-  <script src="app.js"></script>
+  <script type="module">
+    import { auth } from './firebase.js';
+    import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/12.5.0/firebase-auth.js";
+
+    const emailInput = document.getElementById("email");
+    const passwordInput = document.getElementById("password");
+    const loginBtn = document.getElementById("loginBtn");
+    const registerBtn = document.getElementById("registerBtn");
+    const message = document.getElementById("message");
+
+    // Register
+    registerBtn.addEventListener("click", async () => {
+      try {
+        await createUserWithEmailAndPassword(auth, emailInput.value, passwordInput.value);
+        message.style.color = "green";
+        message.textContent = "Account created successfully!";
+        setTimeout(() => window.location.href = "dashboard.html", 1500);
+      } catch (error) {
+        message.style.color = "red";
+        message.textContent = error.message;
+      }
+    });
+
+    // Login
+    loginBtn.addEventListener("click", async () => {
+      try {
+        await signInWithEmailAndPassword(auth, emailInput.value, passwordInput.value);
+        message.style.color = "green";
+        message.textContent = "Login successful!";
+        setTimeout(() => window.location.href = "dashboard.html", 1000);
+      } catch (error) {
+        message.style.color = "red";
+        message.textContent = error.message;
+      }
+    });
+  </script>
 </body>
 </html>
