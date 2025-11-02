@@ -3,17 +3,28 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>LaamSocial Dashboard</title>
+  <title>LaamSocial Feed</title>
   <link rel="stylesheet" href="style.css" />
 
   <!-- Firebase SDKs -->
   <script src="https://www.gstatic.com/firebasejs/9.24.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.24.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.24.0/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.24.0/firebase-storage-compat.js"></script>
 </head>
 <body>
   <div class="container dashboard">
     <h2>Welcome to LaamSocial!</h2>
     <p>Logged in as: <strong id="userEmail"></strong></p>
+
+    <form id="postForm">
+      <textarea id="postText" placeholder="What's on your mind?" required></textarea>
+      <input type="file" id="postImage" accept="image/*" />
+      <button type="submit">Post</button>
+    </form>
+
+    <div class="feed-container" id="feed"></div>
+
     <button class="logout-btn" id="logoutBtn">Logout</button>
   </div>
 
