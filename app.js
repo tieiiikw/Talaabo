@@ -3,7 +3,7 @@ import {
   onAuthStateChanged, signOut
 } from "https://www.gstatic.com/firebasejs/12.5.0/firebase-auth.js";
 import {
-  collection, addDoc, getDocs, serverTimestamp, query, orderBy, onSnapshot, updateDoc
+  collection, addDoc, getDocs, serverTimestamp, query, orderBy, onSnapshot, updateDoc, where
 } from "https://www.gstatic.com/firebasejs/12.5.0/firebase-firestore.js";
 import {
   ref, uploadBytes, getDownloadURL
@@ -24,6 +24,8 @@ const sendBtn = document.getElementById("sendBtn");
 
 const profileEmail = document.getElementById("profileEmail");
 const lastSeenEl = document.getElementById("lastSeen");
+const profilePicInput = document.getElementById("profilePicInput");
+const profilePicDisplay = document.getElementById("profilePicDisplay");
 
 let currentUserEmail = "";
 let unsubscribeChat = null;
@@ -37,12 +39,15 @@ onAuthStateChanged(auth, async (user) => {
 
     // Add user to users collection if not exists
     const usersSnapshot = await getDocs(collection(db, "users"));
-    if(!usersSnapshot.docs.some(doc => doc.data().email === currentUserEmail)){
-      await addDoc(collection(db, "users"), { email: currentUserEmail, lastSeen: serverTimestamp() });
+    let userDoc = usersSnapshot.docs.find(doc => doc.data().email === currentUserEmail);
+    if(!userDoc){
+      userDoc = await addDoc(collection(db, "users"), { email: currentUserEmail, lastSeen: serverTimestamp(), profilePic: "" });
     } else {
       // update last seen
-      const userDoc = usersSnapshot.docs.find(doc => doc.data().email === currentUserEmail);
       await updateDoc(userDoc.ref, { lastSeen: serverTimestamp() });
+      if(userDoc.data().profilePic){
+        profilePicDisplay.src = userDoc.data().profilePic;
+      }
     }
 
     loadFeed();
@@ -57,6 +62,22 @@ logoutBtn.addEventListener("click", async () => {
   if(unsubscribeChat) unsubscribeChat();
   await signOut(auth);
   window.location.href = "index.html";
+});
+
+// -------- Profile Picture Upload --------
+profilePicInput.addEventListener("change", async () => {
+  const file = profilePicInput.files[0];
+  if(!file) return;
+
+  const fileRef = ref(storage, `profilePics/${currentUserEmail}_${Date.now()}_${file.name}`);
+  await uploadBytes(fileRef, file);
+  const url = await getDownloadURL(fileRef);
+
+  // Update user doc
+  const usersSnapshot = await getDocs(collection(db, "users"));
+  const userDoc = usersSnapshot.docs.find(doc => doc.data().email === currentUserEmail);
+  await updateDoc(userDoc.ref, { profilePic: url });
+  profilePicDisplay.src = url;
 });
 
 // -------- Post functionality --------
@@ -84,9 +105,15 @@ postBtn.addEventListener("click", async () => {
 });
 
 // -------- Load Feed --------
-async function loadFeed() {
+async function loadFeed(filterUser=null) {
   feed.innerHTML = "<p>Loading posts...</p>";
-  const q = query(collection(db, "posts"), orderBy("createdAt", "desc"));
+  let q;
+  if(filterUser){
+    q = query(collection(db, "posts"), where("user","==",filterUser), orderBy("createdAt"));
+  } else {
+    q = query(collection(db, "posts"), orderBy("createdAt", "desc"));
+  }
+
   const snapshot = await getDocs(q);
   feed.innerHTML = "";
   snapshot.forEach(doc => {
