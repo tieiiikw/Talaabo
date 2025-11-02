@@ -4,7 +4,260 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>LaamSocial Dashboard</title>
-  <link rel="stylesheet" href="style.css">
+  <style>
+    /* Reset and Base Styles */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: Arial, Helvetica, sans-serif;
+    }
+    
+    body {
+      background-color: #f0f2f5;
+      color: #1c1e21;
+    }
+    
+    /* Header Styles */
+    header {
+      background-color: #ffffff;
+      padding: 10px 16px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+    
+    header h2 {
+      color: #1877f2;
+      font-size: 24px;
+    }
+    
+    header div {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    
+    #userEmail {
+      font-size: 14px;
+    }
+    
+    #logoutBtn {
+      background-color: #1877f2;
+      color: white;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+    
+    /* Main Layout */
+    main {
+      display: grid;
+      grid-template-columns: 1fr 2fr 1fr;
+      gap: 20px;
+      max-width: 1200px;
+      margin: 20px auto;
+      padding: 0 16px;
+    }
+    
+    /* Left Column - Profile and Shortcuts */
+    #profile {
+      background-color: #ffffff;
+      padding: 16px;
+      border-radius: 8px;
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+      margin-bottom: 16px;
+    }
+    
+    #profile h3 {
+      margin-bottom: 12px;
+      font-size: 18px;
+    }
+    
+    #profilePicDisplay {
+      display: block;
+      margin: 0 auto 12px;
+    }
+    
+    #profileEmail {
+      font-weight: bold;
+      margin-bottom: 8px;
+    }
+    
+    #lastSeen {
+      color: #65676b;
+      font-size: 12px;
+    }
+    
+    /* Center Column - Post Creation and Feed */
+    #postSection {
+      background-color: #ffffff;
+      padding: 16px;
+      border-radius: 8px;
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+      margin-bottom: 16px;
+    }
+    
+    #postSection h3 {
+      margin-bottom: 12px;
+      font-size: 18px;
+    }
+    
+    #postText {
+      width: 100%;
+      min-height: 100px;
+      padding: 12px;
+      border: 1px solid #dddfe2;
+      border-radius: 6px;
+      resize: vertical;
+      margin-bottom: 12px;
+      font-size: 16px;
+    }
+    
+    #postImage {
+      margin-bottom: 12px;
+    }
+    
+    #postBtn {
+      background-color: #1877f2;
+      color: white;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: bold;
+      width: 100%;
+    }
+    
+    #feedSection {
+      background-color: #ffffff;
+      padding: 16px;
+      border-radius: 8px;
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+    }
+    
+    #feedSection h3 {
+      margin-bottom: 12px;
+      font-size: 18px;
+    }
+    
+    .post {
+      border-bottom: 1px solid #dddfe2;
+      padding: 16px 0;
+    }
+    
+    .post-header {
+      display: flex;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+    
+    .post-avatar {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      margin-right: 8px;
+    }
+    
+    .post-author {
+      font-weight: bold;
+    }
+    
+    .post-time {
+      color: #65676b;
+      font-size: 12px;
+    }
+    
+    .post-content {
+      margin-bottom: 8px;
+    }
+    
+    .post-image {
+      width: 100%;
+      border-radius: 8px;
+      margin-bottom: 8px;
+    }
+    
+    /* Right Column - Chat */
+    #chatSection {
+      background-color: #ffffff;
+      padding: 16px;
+      border-radius: 8px;
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+    }
+    
+    #chatSection h3 {
+      margin-bottom: 12px;
+      font-size: 18px;
+    }
+    
+    #chatUserSelect {
+      width: 100%;
+      padding: 8px;
+      margin-bottom: 12px;
+      border: 1px solid #dddfe2;
+      border-radius: 6px;
+    }
+    
+    #chatBox {
+      height: 300px;
+      border: 1px solid #dddfe2;
+      border-radius: 6px;
+      padding: 12px;
+      margin-bottom: 12px;
+      overflow-y: auto;
+    }
+    
+    .message {
+      margin-bottom: 8px;
+      padding: 8px;
+      border-radius: 18px;
+      max-width: 80%;
+    }
+    
+    .message.sent {
+      background-color: #1877f2;
+      color: white;
+      margin-left: auto;
+    }
+    
+    .message.received {
+      background-color: #f0f2f5;
+      color: #1c1e21;
+    }
+    
+    #chatInput {
+      width: 100%;
+      padding: 12px;
+      border: 1px solid #dddfe2;
+      border-radius: 20px;
+      margin-bottom: 12px;
+    }
+    
+    #sendBtn {
+      background-color: #1877f2;
+      color: white;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: bold;
+      width: 100%;
+    }
+    
+    /* Responsive Design */
+    @media (max-width: 900px) {
+      main {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
 </head>
 <body>
   <header>
@@ -16,39 +269,113 @@
   </header>
 
   <main>
-    <!-- Profile Section -->
-    <section id="profile">
-      <h3>Profile</h3>
-      <img id="profilePicDisplay" src="default-profile.png" alt="Profile Picture" style="width:80px;height:80px;border-radius:50%;">
-      <input type="file" id="profilePicInput" accept="image/*">
-      <p id="profileEmail"></p>
-      <p id="lastSeen"></p>
-    </section>
+    <!-- Left Column -->
+    <div class="left-column">
+      <!-- Profile Section -->
+      <section id="profile">
+        <h3>Profile</h3>
+        <img id="profilePicDisplay" src="default-profile.png" alt="Profile Picture">
+        <input type="file" id="profilePicInput" accept="image/*">
+        <p id="profileEmail"></p>
+        <p id="lastSeen"></p>
+      </section>
+      
+      <!-- Shortcuts Section (Facebook-style) -->
+      <section id="shortcuts">
+        <h3>Shortcuts</h3>
+        <ul>
+          <li>Friends</li>
+          <li>Groups</li>
+          <li>Marketplace</li>
+          <li>Watch</li>
+          <li>Memories</li>
+        </ul>
+      </section>
+    </div>
 
-    <!-- Post Section -->
-    <section id="postSection">
-      <h3>Create Post</h3>
-      <textarea id="postText" placeholder="What's on your mind?"></textarea>
-      <input type="file" id="postImage" accept="image/*">
-      <button id="postBtn">Post</button>
-    </section>
+    <!-- Center Column -->
+    <div class="center-column">
+      <!-- Post Section -->
+      <section id="postSection">
+        <h3>Create Post</h3>
+        <textarea id="postText" placeholder="What's on your mind?"></textarea>
+        <input type="file" id="postImage" accept="image/*">
+        <button id="postBtn">Post</button>
+      </section>
 
-    <!-- Feed Section -->
-    <section id="feedSection">
-      <h3>Feed</h3>
-      <div id="feed">Loading posts...</div>
-    </section>
+      <!-- Feed Section -->
+      <section id="feedSection">
+        <h3>Feed</h3>
+        <div id="feed">
+          <!-- Sample post for demonstration -->
+          <div class="post">
+            <div class="post-header">
+              <img class="post-avatar" src="default-profile.png" alt="User Avatar">
+              <div>
+                <div class="post-author">Iman Jama</div>
+                <div class="post-time">24m •</div>
+              </div>
+            </div>
+            <div class="post-content">
+              Mareykanka ayaa isku diyaarinaya howlgallo cusub oo laga fuliyo bariga dhexe, xilli indhaha oo dhan ay ku jeedaan ho...see more
+            </div>
+            <div class="post-actions">
+              <button>Like</button>
+              <button>Comment</button>
+              <button>Share</button>
+            </div>
+          </div>
+          
+          <!-- Another sample post -->
+          <div class="post">
+            <div class="post-header">
+              <img class="post-avatar" src="default-profile.png" alt="User Avatar">
+              <div>
+                <div class="post-author">Arab East</div>
+                <div class="post-time">1h •</div>
+              </div>
+            </div>
+            <div class="post-content">
+              America issues a "final warning" to...
+            </div>
+            <div class="post-actions">
+              <button>Like</button>
+              <button>Comment</button>
+              <button>Share</button>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
 
-    <!-- Chat Section -->
-    <section id="chatSection">
-      <h3>Chat</h3>
-      <select id="chatUserSelect">
-        <option value="">Select User</option>
-      </select>
-      <div id="chatBox"></div>
-      <input type="text" id="chatInput" placeholder="Type a message...">
-      <button id="sendBtn">Send</button>
-    </section>
+    <!-- Right Column -->
+    <div class="right-column">
+      <!-- Contacts Section (Facebook-style) -->
+      <section id="contacts">
+        <h3>Contacts</h3>
+        <div class="contact">
+          <img src="default-profile.png" alt="Contact" class="contact-avatar">
+          <span class="contact-name">Bintt Siyad</span>
+        </div>
+        <div class="contact">
+          <img src="default-profile.png" alt="Contact" class="contact-avatar">
+          <span class="contact-name">Iftah Mohamed</span>
+        </div>
+      </section>
+
+      <!-- Chat Section -->
+      <section id="chatSection">
+        <h3>Chat</h3>
+        <select id="chatUserSelect">
+          <option value="">Select User</option>
+          <option value="bintt">Bintt Siyad</option>
+          <option value="iftah">Iftah Mohamed</option>
+        </select>
+        <div id="chatBox"></div>
+        <input type="text" id="chatInput" placeholder="Type a message...">
+        <button id="sendBtn">Send</button>
+      </section>
+    </div>
   </main>
 
   <script type="module" src="app.js"></script>
