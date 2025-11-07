@@ -5595,25 +5595,7 @@ function switchSection(sectionId) {
     }
   }
 
-  function makeAssetElement(name,symbol,amount,usd){
-    const el = document.createElement('div');
-    el.className = "asset-item";
-    el.innerHTML = `
-      <div class="asset-info">
-        <div class="asset-icon">${(symbol||'..').substring(0,2)}</div>
-        <div class="asset-details">
-          <h6>${name}</h6>
-          <span>${symbol}</span>
-        </div>
-      </div>
-      <div class="asset-balance">
-        <div class="asset-amount">${amount}</div>
-        <div class="asset-value">${usd || ''}</div>
-      </div>
-    `;
-    return el;
-  }
-
+  
   // Add token button handler: save token to localStorage and re-render
   addTokenBtn && addTokenBtn.addEventListener('click', async ()=>{
     const addr = (newTokenAddress.value||"").trim();
